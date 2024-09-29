@@ -3,6 +3,29 @@ const mongoose = require('mongoose');
 const { globSync } = require('glob');
 const path = require('path');
 
+// Function to log the directory structure
+const logDirectoryStructure = (dirPath, indent = '') => {
+  try {
+    const files = fs.readdirSync(dirPath);
+    files.forEach(file => {
+      const fullPath = path.join(dirPath, file);
+      console.log(`${indent}- ${file}`);
+      if (fs.statSync(fullPath).isDirectory()) {
+        logDirectoryStructure(fullPath, `${indent}  `); // Recursive call for subdirectories
+      }
+    });
+  } catch (error) {
+    console.error(`Error reading directory ${dirPath}: ${error.message}`);
+  }
+};
+
+
+
+// Call this function at the start of your script
+console.log(`Checking models directory at: ${path.join(__dirname, '../../src')}`);
+logDirectoryStructure(path.join(__dirname, '../../src'));
+
+
 // Check Node.js version
 const [major] = process.versions.node.split('.').map(parseFloat);
 if (major < 20) {
