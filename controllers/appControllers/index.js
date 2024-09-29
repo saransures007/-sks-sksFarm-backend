@@ -5,7 +5,7 @@ const { globSync } = require('glob');
 const path = require('path');
 
 console.log("routesList:", routesList)
-const pattern = './src/controllers/appControllers/*/**/';
+const pattern = './controllers/appControllers/*/**/';
 const controllerDirectories = globSync(pattern).map((filePath) => {
   return path.basename(filePath);
 });

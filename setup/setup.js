@@ -49,7 +49,7 @@ async function setupApp() {
 
     // new settings sksFarm
     const FarmsettingFiles = [];
-    const FarmsettingsFiles = globSync('./src/setup/sksFarmSettings/**/*.json');
+    const FarmsettingsFiles = globSync('./setup/sksFarmSettings/**/*.json');
 
     for (const filePath of FarmsettingsFiles) {
       const file = JSON.parse(fs.readFileSync(filePath, 'utf-8'));

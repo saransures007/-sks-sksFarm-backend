@@ -2,7 +2,7 @@ const { basename, extname } = require('path');
 const { globSync } = require('glob');
 
 // Define the pattern for model files
-const pattern = './src/models/**/*.js';
+const pattern = './models/**/*.js';
 
 // Get all model files while excluding index.js
 const appModelsFiles = globSync(pattern).filter(filePath => basename(filePath) !== 'index.js');
@@ -16,6 +16,8 @@ const modelsFiles = appModelsFiles.map((filePath) => {
   );
   return fileNameWithoutExtension;
 });
+
+console.log("modelsFiles", modelsFiles)
 
 const controllersList = [];
 const appModelsList = [];

@@ -1,8 +1,0 @@
-[build]
-  functions = "netlify/functions"  # Directory for serverless functions
-  publish = "dist"                  # Your static files directory, change as needed
-
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/express"
-  status = 200

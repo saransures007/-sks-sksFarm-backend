@@ -41,7 +41,7 @@ const dbUri = process.env.DATABASE;
 
 // Function to load models after connecting to MongoDB
 async function loadModels() {
-  const modelFiles = globSync('./src/models/**/*.js');
+  const modelFiles = globSync('./models/**/*.js');
   console.log('Registering models:', modelFiles);
 
   modelFiles.forEach(filePath => {
@@ -66,8 +66,8 @@ async function initializeApp() {
   try {
 
     // Call this function at the start of your script
-    console.log(`Checking models directory at: ${path.join(__dirname, './')}`);
-    await logDirectoryStructure(path.join(__dirname, './')); 
+    console.log(`Checking models directory at: ${path.join(__dirname, './models')}`);
+    await logDirectoryStructure(path.join(__dirname, './models')); 
      console.log('✔️ directory Loadeded successfully!');
     // 1. Connect to MongoDB
     await mongoose.connect(dbUri, {
