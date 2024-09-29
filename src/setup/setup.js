@@ -17,7 +17,7 @@ mongoose.connect(process.env.DATABASE)
 
 async function setupApp() {
   try {
-    const Admin = require('../models/Admin');
+    const Admin = require('../models/admin');
     const AdminPassword = require('../models/AdminPassword');
     const newAdminPassword = new AdminPassword();
     const salt = uniqueId();

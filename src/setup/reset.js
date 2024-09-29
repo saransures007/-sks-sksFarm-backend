@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.DATABASE);
 
 async function deleteData() {
-  const Admin = require('../models/Admin');
+  const Admin = require('../models/admin');
   const AdminPassword = require('../models/AdminPassword');
   const Setting = require('../models/Setting');
 
