@@ -3,37 +3,62 @@ const mongoose = require('mongoose');
 const { globSync } = require('glob');
 const path = require('path');
 
-// Make sure we are running node 7.6+
-const [major, minor] = process.versions.node.split('.').map(parseFloat);
+// Check Node.js version
+const [major] = process.versions.node.split('.').map(parseFloat);
 if (major < 20) {
-  console.log('Please upgrade your node.js version at least 20 or greater. 👌\n ');
+  console.log('Please upgrade your Node.js version to 20 or greater. 👌');
   process.exit();
 }
 
-// import environmental variables from our variables.env file
+// Load environment variables
 require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 
-mongoose.connect(process.env.DATABASE);
+const dbUri = process.env.DATABASE;
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+// Function to load models after connecting to MongoDB
+async function loadModels() {
+  const modelFiles = globSync('./src/models/**/*.js');
+  console.log('Registering models:', modelFiles);
 
-mongoose.connection.on('error', (error) => {
-  console.log(
-    `1. 🔥 Common Error caused issue → : check your .env file first and add your mongodb url`
-  );
-  console.error(`2. 🚫 Error → : ${error.message}`);
-});
+  modelFiles.forEach(filePath => {
+    require(path.resolve(filePath));  // Register each model
+  });
 
-const modelsFiles = globSync('./src/models/**/*.js');
-
-for (const filePath of modelsFiles) {
-  require(path.resolve(filePath));
+  console.log('✅ All models registered.');
 }
 
-// Start our app!
-const app = require('./app');
-app.set('port', process.env.PORT || 8888);
-const server = app.listen(app.get('port'), () => {
-  console.log(`Express running → On PORT : ${server.address().port}`);
-});
+// Start the Express app
+function startApp() {
+  const app = require('./app');
+  app.set('port', process.env.PORT || 8888);
+
+  const server = app.listen(app.get('port'), () => {
+    console.log(`🚀 Express running → PORT: ${server.address().port}`);
+  });
+}
+
+// Connect to MongoDB, then register models, and finally start the app
+async function initializeApp() {
+  try {
+    // 1. Connect to MongoDB
+    await mongoose.connect(dbUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log('✔️ MongoDB connected successfully!');
+
+    // 2. Register models after successful DB connection
+    await loadModels();
+
+    // 3. Start the Express server after models are loaded
+    startApp();
+  } catch (err) {
+    console.error('❌ Initialization failed:', err);
+    process.exit(1);  // Exit on failure
+  }
+}
+
+// Start the initialization process
+initializeApp();
