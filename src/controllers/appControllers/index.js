@@ -16,7 +16,7 @@ const appControllers = () => {
 
   controllerDirectories.forEach((controllerName) => {
     try {
-      const customController = require('../..//controllers/appControllers/' + controllerName);
+      const customController = require('../../controllers/appControllers/' + controllerName);
 
       if (customController) {
         hasCustomControllers.push(controllerName);
