@@ -1,4 +1,3 @@
-// src/app.js
 console.log("using farm app")
 const express = require('express');
 const cors = require('cors');
@@ -44,6 +43,11 @@ app.use('/api', coreAuthRouter);
 app.use('/api', adminAuth.isValidAuthToken, coreApiRouter);
 app.use('/api', adminAuth.isValidAuthToken, erpApiRouter);
 app.use('/public', corePublicRouter);
+
+// Add /api/home route
+app.get('/api/home', (req, res) => {
+  res.send('Hello World');
+});
 
 // 404 handler
 app.use(errorHandlers.notFound);
