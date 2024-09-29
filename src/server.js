@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 const { globSync } = require('glob');
 const path = require('path');
 
+console.log("starting app")
 // Function to log the directory structure
-const logDirectoryStructure = (dirPath, indent = '') => {
+async function logDirectoryStructure (dirPath, indent = '') {
   try {
     const files = fs.readdirSync(dirPath);
     files.forEach(file => {
@@ -21,9 +22,7 @@ const logDirectoryStructure = (dirPath, indent = '') => {
 
 
 
-// Call this function at the start of your script
-console.log(`Checking models directory at: ${path.join(__dirname, '../../src')}`);
-logDirectoryStructure(path.join(__dirname, '../../src'));
+
 
 
 // Check Node.js version
@@ -64,6 +63,12 @@ function startApp() {
 // Connect to MongoDB, then register models, and finally start the app
 async function initializeApp() {
   try {
+
+    // Call this function at the start of your script
+    console.log(`Checking models directory at: ${path.join(__dirname, '../../src')}`);
+    await logDirectoryStructure(path.join(__dirname, '../../src')); 
+
+     console.log('✔️ directory Loadeded successfully!');
     // 1. Connect to MongoDB
     await mongoose.connect(dbUri, {
       useNewUrlParser: true,
