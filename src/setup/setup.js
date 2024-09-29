@@ -17,8 +17,8 @@ mongoose.connect(process.env.DATABASE)
 
 async function setupApp() {
   try {
-    const Admin = require('../models/coreModels/Admin');
-    const AdminPassword = require('../models/coreModels/AdminPassword');
+    const Admin = require('../models/utils/Admin');
+    const AdminPassword = require('../models/utils/AdminPassword');
     const newAdminPassword = new AdminPassword();
     const salt = uniqueId();
     const passwordHash = newAdminPassword.generateHash(salt, 'admin123');
@@ -42,7 +42,7 @@ async function setupApp() {
 
     console.log('👍 Admin created : Done!');
 
-      const Setting = require('../models/coreModels/Setting');
+      const Setting = require('../models/utils/Setting');
 
       // Debugging: Check if the Setting model is loaded correctly
       console.log('Setting model:', Setting);
