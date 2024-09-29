@@ -1,0 +1,44 @@
+[
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "breed",
+      "settingValue": ["Sindhu", "Jersey", "Shaiwal", "Gir", "Cross Breed"],
+      "valueType": "array"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "origin",
+      "settingValue": ["Local Farm", "Imported Farm"],
+      "valueType": "array"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "expected_liter_min",
+      "settingValue": 1,
+      "valueType": "number"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "expected_liter_max",
+      "settingValue": 60,
+      "valueType": "number"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "gender",
+      "settingValue": ["Cow", "Bull"],
+      "valueType": "array"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "ear_tag_number_format",
+      "settingValue": "unique",
+      "valueType": "string"
+  },
+  {
+      "settingCategory": "cow_settings",
+      "settingKey": "rfid_key_format",
+      "settingValue": "unique", 
+      "valueType": "string"
+  }
+]

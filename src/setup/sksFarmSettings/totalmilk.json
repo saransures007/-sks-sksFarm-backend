@@ -1,0 +1,21 @@
+[
+    {
+      "settingCategory": "overall_milk_production_settings",
+      "settingKey": "daily_milk_production_limit",
+      "settingValue": 1000,
+      "valueType": "number"
+    },
+    {
+      "settingCategory": "overall_milk_production_settings",
+      "settingKey": "default_avg_snf",
+      "settingValue": 8.7,
+      "valueType": "number"
+    },
+    {
+      "settingCategory": "overall_milk_production_settings",
+      "settingKey": "default_avg_fat",
+      "settingValue": 4.0,
+      "valueType": "number"
+    }
+  ]
+  
