@@ -1,5 +1,6 @@
 const serverless = require('serverless-http');
 const mongoose = require('mongoose');
+require('module-alias/register');
 const path = require('path');
 const fs = require('fs');
 /////----------------------------------
