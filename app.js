@@ -45,7 +45,7 @@ app.use('/api', adminAuth.isValidAuthToken, erpApiRouter);
 app.use('/public', corePublicRouter);
 
 // Add /api/home route
-app.get('/api/home', (req, res) => {
+app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
