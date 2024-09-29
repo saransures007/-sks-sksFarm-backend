@@ -1,7 +1,6 @@
 [build]
   functions = "netlify/functions"  # Directory for serverless functions
   publish = "dist"                  # Your static files directory, change as needed
-  command = "npm run build"         # Your build command, change as needed
 
 [[redirects]]
   from = "/*"
