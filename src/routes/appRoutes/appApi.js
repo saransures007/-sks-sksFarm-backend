@@ -3,7 +3,7 @@ const { catchErrors } = require('../../handlers/errorHandlers');
 const router = express.Router();
 
 const appControllers = require('../../controllers/appControllers');
-const { routesList } = require('../../models/utils');
+const { routesList } = require('../../modelList/utils');
 
 const routerApp = (entity, controller) => {
   router.route(`/${entity}/create`).post(catchErrors(controller['create']));
