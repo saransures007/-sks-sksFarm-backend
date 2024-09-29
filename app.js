@@ -1,35 +1,21 @@
-console.log("using farm app")
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 
-console.log("loading coreAuth")
+// Import routers and handlers
 const coreAuthRouter = require('./routes/coreRoutes/coreAuth');
-
-console.log("loading coreApi")
 const coreApiRouter = require('./routes/coreRoutes/coreApi');
-
 const corePublicRouter = require('./routes/coreRoutes/corePublicRouter');
 const adminAuth = require('./controllers/coreControllers/adminAuth');
-
 const errorHandlers = require('./handlers/errorHandlers');
 const erpApiRouter = require('./routes/appRoutes/appApi');
 
 const app = express();
 
-console.log("loading router")
-
-// CORS configuration with credentials
-const allowedOrigins = ['http://localhost:3000', 'https://your-production-domain.com']; // Define allowed origins
+// CORS configuration to allow all origins
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allows all origins
   credentials: true, // Allow credentials (cookies, etc.)
 }));
 
