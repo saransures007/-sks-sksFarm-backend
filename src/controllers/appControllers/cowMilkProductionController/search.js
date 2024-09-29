@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const search = async (CowMilkProductionModel, CowModel, req, res) => {
   const { searchValue } = req.query;
 
-  // Define criteria for searching in CowMilkProduction
+  // Define criteria for searching in cowMilkProduction
   const criteria = {};
 
   try {
@@ -38,7 +38,7 @@ const search = async (CowMilkProductionModel, CowModel, req, res) => {
     const result = await CowMilkProductionModel.find(criteria)
       .populate({
         path: 'cowId', 
-        select: 'id earTagNumber rfidKey', // Select only these fields from the Cow model
+        select: 'id earTagNumber rfidKey', // Select only these fields from the cow model
       });
 
     return res.status(200).json({

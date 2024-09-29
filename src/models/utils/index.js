@@ -31,7 +31,7 @@ for (const filePath of appModelsFiles) {
     ''
   );
   const firstChar = fileNameWithoutExtension.charAt(0);
-  const modelName = fileNameWithoutExtension.replace(firstChar, firstChar.toUpperCase());
+  const modelName = fileNameWithoutExtension.replace(firstChar, firstChar.toLowerCase());
   const fileNameLowerCaseFirstChar = fileNameWithoutExtension.replace(
     firstChar,
     firstChar.toLowerCase()

@@ -1,5 +1,5 @@
 const createCRUDController = require('../../middlewaresControllers/createCRUDController');
-const crudController = createCRUDController('Email');
+const crudController = createCRUDController('email');
 
 const emailMethods = {
   create:crudController.create,

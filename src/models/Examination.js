@@ -28,4 +28,4 @@ const examinationSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Examination', examinationSchema);
+module.exports = mongoose.model('examination', examinationSchema);

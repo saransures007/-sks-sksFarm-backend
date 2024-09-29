@@ -26,7 +26,7 @@
   {
       "settingCategory": "cow_settings",
       "settingKey": "gender",
-      "settingValue": ["Cow", "Bull"],
+      "settingValue": ["cow", "Bull"],
       "valueType": "array"
   },
   {

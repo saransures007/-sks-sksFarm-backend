@@ -3,8 +3,8 @@ const { Schema } = mongoose;
 
 const milkSchema = new mongoose.Schema({
   cowId: {
-    type: Schema.Types.ObjectId, // Reference to Cow model
-    ref: 'Cow', // Name of the model you are referencing
+    type: Schema.Types.ObjectId, // Reference to cow model
+    ref: 'cow', // Name of the model you are referencing
     required: true,
   },
   liter: {
@@ -37,4 +37,4 @@ const milkSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('CowMilkProduction', milkSchema);
+module.exports = mongoose.model('cowMilkProduction', milkSchema);

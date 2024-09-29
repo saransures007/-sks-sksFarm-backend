@@ -7,7 +7,7 @@ const summaryCows = async (Model, req, res) => {
           totalCows: { $sum: 1 }, // Total number of cows
           avgExpectedLiter: { $avg: '$expectedLiter' }, // Average expected milk liters
           cowCount: {
-            $sum: { $cond: [{ $eq: ['$gender', 'Cow'] }, 1, 0] } // Count of cows
+            $sum: { $cond: [{ $eq: ['$gender', 'cow'] }, 1, 0] } // Count of cows
           },
           bullCount: {
             $sum: { $cond: [{ $eq: ['$gender', 'Bull'] }, 1, 0] } // Count of bulls

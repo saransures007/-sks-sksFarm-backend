@@ -8,7 +8,7 @@ const AdminPasswordSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  user: { type: mongoose.Schema.ObjectId, ref: 'Admin', required: true, unique: true },
+  user: { type: mongoose.Schema.ObjectId, ref: 'admin', required: true, unique: true },
   password: {
     type: String,
     required: true,
@@ -44,4 +44,4 @@ AdminPasswordSchema.methods.validPassword = function (salt, userpassword) {
   return bcrypt.compareSync(salt + userpassword, this.password);
 };
 
-module.exports = mongoose.model('AdminPassword', AdminPasswordSchema);
+module.exports = mongoose.model('adminPassword', AdminPasswordSchema);

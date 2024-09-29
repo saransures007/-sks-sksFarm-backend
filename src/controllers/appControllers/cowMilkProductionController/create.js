@@ -1,4 +1,4 @@
-const CowMilkProduction = async (Model, req, res) => {
+const cowMilkProduction = async (Model, req, res) => {
   const { cowId, liter, snf, fat, silage, entryDate, addedBy } = req.body;
 
   console.log("creating milk production");
@@ -37,4 +37,4 @@ const CowMilkProduction = async (Model, req, res) => {
   }
 };
 
-module.exports = CowMilkProduction;
+module.exports = cowMilkProduction;

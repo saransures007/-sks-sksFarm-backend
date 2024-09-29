@@ -6,8 +6,8 @@ const calfSchema = new mongoose.Schema({
     required: true,
   },
   motherId: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the Cow model
-    ref: 'Cow',
+    type: mongoose.Schema.Types.ObjectId, // Reference to the cow model
+    ref: 'cow',
     required: true,
   },
   birthDate: {
@@ -31,4 +31,4 @@ const calfSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Calf', calfSchema);
+module.exports = mongoose.model('calf', calfSchema);

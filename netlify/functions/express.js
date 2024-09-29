@@ -69,10 +69,10 @@ const connectToDatabase = async () => {
 
     // Debugging: Check if a specific model is registered
     try {
-      const Setting = mongoose.model('Setting'); // Ensure the model is defined
-      console.log('Setting model:', Setting);
+      const setting = mongoose.model('setting'); // Ensure the model is defined
+      console.log('setting model:', setting);
     } catch (error) {
-      console.error('Error: Setting model is not registered:', error.message);
+      console.error('Error: setting model is not registered:', error.message);
     }
 
     // Now we can import the app since the connection is established

@@ -1,4 +1,4 @@
-const { modelsFiles } = require('../../../models/kfc'); // Ensure this utility exports the correct model names
+const { modelsFiles } = require('../../../models/utils'); // Ensure this utility exports the correct model names
 const mongoose = require('mongoose');
 
 const create = require('./create');

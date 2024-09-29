@@ -5,27 +5,27 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.DATABASE);
 
 async function deleteData() {
-  const Admin = require('../models/admin');
-  const AdminPassword = require('../models/AdminPassword');
-  const Setting = require('../models/Setting');
+  const admin = require('../models/admin');
+  const adminPassword = require('../models/adminPassword');
+  const setting = require('../models/setting');
 
-  const TotalMilkProduction = require('../models/TotalMilkProduction');
-  await TotalMilkProduction.deleteMany();
-  console.log('👍 TotalMilkProduction Deleted. To setup demo TotalMilkProduction data, run\n\n\t npm run setup\n\n');
+  const totalMilkProduction = require('../models/totalMilkProduction');
+  await totalMilkProduction.deleteMany();
+  console.log('👍 totalMilkProduction Deleted. To setup demo totalMilkProduction data, run\n\n\t npm run setup\n\n');
    
-  const milk = require('../models/CowMilkProduction');
+  const milk = require('../models/cowMilkProduction');
   await milk.deleteMany();
   console.log('👍 milk Deleted. To setup demo milk data, run\n\n\t npm run setup\n\n');
 
-  const Cow = require('../models/Cow');
-  await Cow.deleteMany();
-  console.log('👍 Cow. To setup demo Cow data, run\n\n\t npm run setup\n\n');
+  const cow = require('../models/cow');
+  await cow.deleteMany();
+  console.log('👍 cow. To setup demo cow data, run\n\n\t npm run setup\n\n');
 
-  await Admin.deleteMany();
-  await AdminPassword.deleteMany();
-  console.log('👍 Admin Deleted. To setup demo admin data, run\n\n\t npm run setup\n\n');
-  await Setting.deleteMany();
-  console.log('👍 Setting Deleted. To setup Setting data, run\n\n\t npm run setup\n\n');
+  await admin.deleteMany();
+  await adminPassword.deleteMany();
+  console.log('👍 admin Deleted. To setup demo admin data, run\n\n\t npm run setup\n\n');
+  await setting.deleteMany();
+  console.log('👍 setting Deleted. To setup setting data, run\n\n\t npm run setup\n\n');
 
   process.exit();
 }

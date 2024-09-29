@@ -17,20 +17,20 @@ mongoose.connect(process.env.DATABASE)
 
 async function setupApp() {
   try {
-    const Admin = require('../models/admin');
-    const AdminPassword = require('../models/AdminPassword');
-    const newAdminPassword = new AdminPassword();
+    const admin = require('../models/admin');
+    const adminPassword = require('../models/adminPassword');
+    const newAdminPassword = new adminPassword();
     const salt = uniqueId();
     const passwordHash = newAdminPassword.generateHash(salt, 'admin123');
 
     const demoAdmin = {
       email: 'admin@demo.com',
       name: 'IDURAR',
-      surname: 'Admin',
+      surname: 'admin',
       enabled: true,
       role: 'owner',
     };
-    const result = await new Admin(demoAdmin).save();
+    const result = await new admin(demoAdmin).save();
 
     const AdminPasswordData = {
       password: passwordHash,
@@ -38,14 +38,14 @@ async function setupApp() {
       salt: salt,
       user: result._id,
     };
-    await new AdminPassword(AdminPasswordData).save();
+    await new adminPassword(AdminPasswordData).save();
 
-    console.log('👍 Admin created : Done!');
+    console.log('👍 admin created : Done!');
 
-      const Setting = require('../models/Setting');
+      const setting = require('../models/setting');
 
-      // Debugging: Check if the Setting model is loaded correctly
-      console.log('Setting model:', Setting);
+      // Debugging: Check if the setting model is loaded correctly
+      console.log('setting model:', setting);
 
     // new settings sksFarm
     const FarmsettingFiles = [];
@@ -56,7 +56,7 @@ async function setupApp() {
       FarmsettingFiles.push(...file);
     }
 
-    await Setting.insertMany(FarmsettingFiles);
+    await setting.insertMany(FarmsettingFiles);
     console.log('👍 Farm Settings created : Done!');
 
     console.log('🥳 Setup completed : Success!');

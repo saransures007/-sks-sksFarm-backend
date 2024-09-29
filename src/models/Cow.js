@@ -45,7 +45,7 @@ const cowSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ['Cow', 'Bull'], // Gender can be 'Cow' or 'Bull'
+    enum: ['cow', 'Bull'], // Gender can be 'cow' or 'Bull'
     required: true,
   },
   soldDate: {
@@ -57,4 +57,4 @@ const cowSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Cow', cowSchema);
+module.exports = mongoose.model('cow', cowSchema);

@@ -12,13 +12,13 @@ const emailController = require('../../controllers/coreControllers/emailControll
 
 const { singleStorageUpload } = require('../../middlewares/uploadMiddleware');
 
-// //_______________________________ Admin management_______________________________
+// //_______________________________ admin management_______________________________
 
 router.route('/admin/read/:id').get(catchErrors(adminController.read));
 
 router.route('/admin/password-update/:id').patch(catchErrors(adminController.updatePassword));
 
-//_______________________________ Admin Profile _______________________________
+//_______________________________ admin Profile _______________________________
 
 router.route('/admin/profile/password').patch(catchErrors(adminController.updateProfilePassword));
 router
@@ -28,7 +28,7 @@ router
     catchErrors(adminController.updateProfile)
   );
 
-// //____________________________________________ API for Global Setting _________________
+// //____________________________________________ API for Global setting _________________
 
 router.route('/setting/create').post(catchErrors(settingController.create));
 router.route('/setting/read/:id').get(catchErrors(settingController.read));
@@ -55,7 +55,7 @@ router
   );
 router.route('/setting/updateManySetting').patch(catchErrors(settingController.updateManySetting));
 
-// //____________________________________________ API for Email Templates _________________
+// //____________________________________________ API for email Templates _________________
 router.route('/email/create').post(catchErrors(emailController.create));
 router.route('/email/read/:id').get(catchErrors(emailController.read));
 router.route('/email/update/:id').patch(catchErrors(emailController.update));

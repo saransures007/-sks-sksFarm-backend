@@ -2,7 +2,7 @@
 exports.migrate = (result) => {
   let newData = {};
   
-  // Base fields from the CowMilkProduction model
+  // Base fields from the cowMilkProduction model
   newData._id = result._id;
   newData.liter = result.liter;
   newData.entryDate = result.entryDate;
@@ -13,7 +13,7 @@ exports.migrate = (result) => {
 
   // Populate cow details if available
   if (result.cowId) {
-    newData.cowId = result.cowId._id;  // Cow ID
+    newData.cowId = result.cowId._id;  // cow ID
     newData.earTagNumber = result.cowId.earTagNumber; // Ear tag number
     newData.rfidKey = result.cowId.rfidKey; // RFID key
   }

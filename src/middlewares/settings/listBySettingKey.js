@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Model = mongoose.model('Setting');
+const Model = mongoose.model('setting');
 
 const listBySettingKey = async ({ settingKeyArray = [] }) => {
   try {

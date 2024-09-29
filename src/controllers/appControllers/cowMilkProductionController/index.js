@@ -12,9 +12,9 @@ const listAll = require('./listAll');
 const paginatedList = require('./paginatedList');
 
 function modelController() {
-  const Model = mongoose.model('CowMilkProduction');
-   const CowModel = mongoose.model('Cow');
-  const methods = createCRUDController('CowMilkProduction');
+  const Model = mongoose.model('cowMilkProduction');
+   const CowModel = mongoose.model('cow');
+  const methods = createCRUDController('cowMilkProduction');
 
   methods.read = (req, res) => read(Model, req, res);
   methods.delete = (req, res) => remove(Model, req, res);

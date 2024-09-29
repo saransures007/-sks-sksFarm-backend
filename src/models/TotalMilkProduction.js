@@ -27,4 +27,4 @@ const TotalMilkProductionSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('TotalMilkProduction', TotalMilkProductionSchema);
+module.exports = mongoose.model('totalMilkProduction', TotalMilkProductionSchema);

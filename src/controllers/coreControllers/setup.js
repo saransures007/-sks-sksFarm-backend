@@ -7,14 +7,14 @@ const { generate: uniqueId } = require('shortid');
 const mongoose = require('mongoose');
 
 const setup = async (req, res) => {
-  const Admin = mongoose.model('Admin');
-  const AdminPassword = mongoose.model('AdminPassword');
-  const Setting = mongoose.model('Setting');
+  const admin = mongoose.model('admin');
+  const adminPassword = mongoose.model('adminPassword');
+  const setting = mongoose.model('setting');
 
   const PaymentMode = mongoose.model('PaymentMode');
   const Taxes = mongoose.model('Taxes');
 
-  const newAdminPassword = new AdminPassword();
+  const newAdminPassword = new adminPassword();
 
   const { name, email, password, language, timezone, country, config = {} } = req.body;
 
@@ -46,7 +46,7 @@ const setup = async (req, res) => {
     name,
     role: 'owner',
   };
-  const result = await new Admin(accountOwnner).save();
+  const result = await new admin(accountOwnner).save();
 
   const AdminPasswordData = {
     password: passwordHash,
@@ -54,7 +54,7 @@ const setup = async (req, res) => {
     salt: salt,
     user: result._id,
   };
-  await new AdminPassword(AdminPasswordData).save();
+  await new adminPassword(AdminPasswordData).save();
 
   const settingData = [];
 
@@ -79,7 +79,7 @@ const setup = async (req, res) => {
     settingData.push(...newSettings);
   }
 
-  await Setting.insertMany(settingData);
+  await setting.insertMany(settingData);
 
   await Taxes.insertMany([{ taxName: 'Tax 0%', taxValue: '0', isDefault: true }]);
 

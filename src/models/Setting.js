@@ -37,4 +37,4 @@ const settingSchema = new mongoose.Schema({
 });
 
 // Ensure that you are exporting the model correctly
-module.exports = mongoose.model('Setting', settingSchema);
+module.exports = mongoose.model('setting', settingSchema);
