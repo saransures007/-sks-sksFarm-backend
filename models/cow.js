@@ -45,11 +45,22 @@ const cowSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ['cow', 'Bull'], // Gender can be 'cow' or 'Bull'
+    enum: ['Cow', 'Bull'], // Gender can be 'cow' or 'Bull'
     required: true,
   },
   soldDate: {
     type: Date, // Date when the cow was sold, if applicable
+  },
+  isMilking: {
+    type: Boolean,
+    required: true,
+    default: false, // Default to false, indicating the cow is not milking
+  },
+  breedingStartDate: {
+    type: Date, // Date when breeding starts
+  },
+  breedingEndDate: {
+    type: Date, // Date when breeding ends
   },
   createdAt: {
     type: Date,

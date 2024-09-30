@@ -16,8 +16,9 @@ exports.migrate = (result) => {
   newData.gender = result.gender;
   newData.soldDate = result.soldDate;
   newData.createdAt = result.createdAt;
-
-  // Add any other necessary fields here, if applicable
+  newData.isMilking = result.isMilking;
+  newData.breedingStartDate = result.breedingStartDate;
+  newData.breedingEndDate = result.breedingEndDate;
 
   return newData;
 };

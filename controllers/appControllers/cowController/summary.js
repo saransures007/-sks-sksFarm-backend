@@ -5,12 +5,11 @@ const summaryCows = async (Model, req, res) => {
         $group: {
           _id: null,
           totalCows: { $sum: 1 }, // Total number of cows
-          avgExpectedLiter: { $avg: '$expectedLiter' }, // Average expected milk liters
-          cowCount: {
-            $sum: { $cond: [{ $eq: ['$gender', 'cow'] }, 1, 0] } // Count of cows
+          currentlyMilking: {
+            $sum: { $cond: [{ $eq: ['$isMilking', true] }, 1, 0] } // Count of cows currently milking
           },
-          bullCount: {
-            $sum: { $cond: [{ $eq: ['$gender', 'Bull'] }, 1, 0] } // Count of bulls
+          notMilking: {
+            $sum: { $cond: [{ $eq: ['$isMilking', false] }, 1, 0] } // Count of cows not milking
           },
         },
       },

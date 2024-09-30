@@ -11,14 +11,19 @@ const createCow = async (Model, req, res) => {
     addedBy,
     birthDate,
     gender,
-    soldDate, // Include soldDate here
+    soldDate, 
+    isMilking, 
+    breedingStartDate, 
+    breedingEndDate, 
   } = req.body;
 
+  console.log("req.body",req.body)
+
   // Ensure required fields are provided
-  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender) {
+  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender ||isMilking) {
     return res.status(400).json({
       success: false,
-      message: 'All fields are required except soldDate.',
+      message: 'All fields are required except soldDate, isMilking.',
     });
   }
 
@@ -35,7 +40,10 @@ const createCow = async (Model, req, res) => {
       addedBy,
       birthDate,
       gender,
-      soldDate, // Add soldDate to the model
+      soldDate, 
+      isMilking,
+      breedingStartDate, 
+      breedingEndDate,
     });
 
     const result = await newCow.save();
