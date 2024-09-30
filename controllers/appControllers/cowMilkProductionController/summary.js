@@ -27,6 +27,29 @@ const summaryMilkProduction = async (Model, req, res) => {
       return day;
     });
 
+    const dailySilageUsagePromises = daysOfWeek.map(async (day) => {
+      const dayStart = new Date(day);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(day);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const dailyData = await Model.aggregate([
+        {
+          $match: { entryDate: { $gte: dayStart, $lte: dayEnd } },
+        },
+        {
+          $group: {
+            _id: null,
+            totalSilage: { $sum: '$silage' },
+          },
+        },
+      ]);
+
+      return dailyData.length > 0 ? dailyData[0].totalSilage : 0;
+    });
+
+    const dailySilageUsagedata = await Promise.all(dailySilageUsagePromises);
+
     const dailyMilkProductionPromises = daysOfWeek.map(async (day) => {
       const dayStart = new Date(day);
       dayStart.setHours(0, 0, 0, 0);
@@ -69,12 +92,17 @@ const summaryMilkProduction = async (Model, req, res) => {
           $group: {
             _id: null,
             totalMilk: { $sum: '$liter' },
+            totalSilage: { $sum: '$silage' },
           },
         },
-      ]).then((dailyData) => (dailyData.length > 0 ? dailyData[0].totalMilk : 0));
+      ]).then((dailyData) => (dailyData.length > 0 ? dailyData[0] : { totalMilk: 0, totalSilage: 0 }));
     });
 
     const dailyMilkProductionThisMonthData = await Promise.all(dailyMilkProductionThisMonthPromises);
+
+    // Calculating totalMilk and totalSilage for this month
+    const totalMilkThisMonth = dailyMilkProductionThisMonthData.reduce((acc, day) => acc + day.totalMilk, 0);
+    const totalSilageThisMonth = dailyMilkProductionThisMonthData.reduce((acc, day) => acc + day.totalSilage, 0);
 
     const summaryData = await Model.aggregate([
       {
@@ -138,23 +166,30 @@ const summaryMilkProduction = async (Model, req, res) => {
     const totalThisWeek = summaryData[0].totalThisWeek.length > 0 ? summaryData[0].totalThisWeek[0] : { totalMilk: 0, totalSilage: 0 };
 
     const result = {
-      bar:{
-      totalToday: {
-        ...totalToday,
-        expectedMilk: expectedMilkPerDay,
-        expectedSilage: expectedSilagePerDay,
+      bar: {
+        totalToday: {
+          ...totalToday,
+          expectedMilk: expectedMilkPerDay,
+          expectedSilage: expectedSilagePerDay,
+        },
+        totalThisWeek: {
+          ...totalThisWeek,
+          expectedMilk: totalThisWeek.totalMilk > 0 ? (expectedMilkPerDay * Math.min(7, new Date().getDay() + 1)) : 0, // Adjusted based on days in the week
+          expectedSilage: totalThisWeek.totalSilage > 0 ? (expectedSilagePerDay * Math.min(7, new Date().getDay() + 1)) : 0,
+        },
+        totalMorning: summaryData[0].totalMorning.length > 0 ? { ...summaryData[0].totalMorning[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
+        totalEvening: summaryData[0].totalEvening.length > 0 ? { ...summaryData[0].totalEvening[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
+        totalThisMonth: {
+          totalMilk: totalMilkThisMonth,
+          totalSilage: totalSilageThisMonth,
+          expectedMilk: expectedMilkPerDay * daysInMonth,
+          expectedSilage: expectedSilagePerDay * daysInMonth,
+        }
       },
-      totalThisWeek: {
-        ...totalThisWeek,
-        expectedMilk: totalThisWeek.totalMilk > 0 ? (expectedMilkPerDay * Math.min(7, new Date().getDay() + 1)) : 0, // Adjusted based on days in the week
-        expectedSilage: totalThisWeek.totalSilage > 0 ? (expectedSilagePerDay * Math.min(7, new Date().getDay() + 1)) : 0,
-      },
-      totalMorning: summaryData[0].totalMorning.length > 0 ? { ...summaryData[0].totalMorning[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
-      totalEvening: summaryData[0].totalEvening.length > 0 ? { ...summaryData[0].totalEvening[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
-    },
       chart: {
-      dailyMilkProduction: dailyMilkProductionData, // Daily production data for the week
-      dailyMilkProductionThisMonth: dailyMilkProductionThisMonthData, // Daily production data for the month
+        dailyMilkProduction: dailyMilkProductionData, // Daily production data for the week
+        dailyMilkProductionThisMonth: dailyMilkProductionThisMonthData, // Daily production data for the month
+        dailySilageUsage: dailySilageUsagedata ,
       }
     };
 
