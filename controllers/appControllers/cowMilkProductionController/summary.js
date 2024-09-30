@@ -1,37 +1,32 @@
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const summaryMilkProduction = async (Model, req, res) => {
   try {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0); // Start of today
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999); // End of today
+    // Get the current time in IST
+    const istTimeZone = 'Asia/Kolkata'; // IST Timezone
+    const todayStart = dayjs().tz(istTimeZone).startOf('day').toDate(); // Start of today
+    const todayEnd = dayjs().tz(istTimeZone).endOf('day').toDate(); // End of today
 
-    const weekStart = new Date();
-    weekStart.setDate(todayStart.getDate() - todayStart.getDay()); // Start of this week
-    weekStart.setHours(0, 0, 0, 0);
+    const weekStart = dayjs().tz(istTimeZone).startOf('week').toDate(); // Start of this week
 
-    const morningStart = new Date();
-    morningStart.setHours(0, 0, 0, 0); // Start of today morning
+    const morningStart = dayjs().tz(istTimeZone).startOf('day').toDate(); // Start of today morning
+    const morningEnd = dayjs().tz(istTimeZone).hour(11).minute(59).second(59).toDate(); // End of today morning
 
-    const morningEnd = new Date();
-    morningEnd.setHours(11, 59, 59, 999); // End of today morning
-
-    const eveningStart = new Date();
-    eveningStart.setHours(12, 0, 0, 0); // Start of today evening
-
-    const eveningEnd = new Date();
-    eveningEnd.setHours(23, 59, 59, 999); // End of today evening
+    const eveningStart = dayjs().tz(istTimeZone).hour(12).toDate(); // Start of today evening
+    const eveningEnd = dayjs().tz(istTimeZone).endOf('day').toDate(); // End of today evening
 
     const daysOfWeek = Array.from({ length: 7 }, (_, i) => {
-      const day = new Date(weekStart);
-      day.setDate(weekStart.getDate() + i);
-      return day;
+      return dayjs(weekStart).add(i, 'day').toDate();
     });
 
     const dailySilageUsagePromises = daysOfWeek.map(async (day) => {
-      const dayStart = new Date(day);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(day);
-      dayEnd.setHours(23, 59, 59, 999);
+      const dayStart = dayjs(day).tz(istTimeZone).startOf('day').toDate();
+      const dayEnd = dayjs(day).tz(istTimeZone).endOf('day').toDate();
 
       const dailyData = await Model.aggregate([
         {
@@ -51,10 +46,8 @@ const summaryMilkProduction = async (Model, req, res) => {
     const dailySilageUsagedata = await Promise.all(dailySilageUsagePromises);
 
     const dailyMilkProductionPromises = daysOfWeek.map(async (day) => {
-      const dayStart = new Date(day);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(day);
-      dayEnd.setHours(23, 59, 59, 999);
+      const dayStart = dayjs(day).tz(istTimeZone).startOf('day').toDate();
+      const dayEnd = dayjs(day).tz(istTimeZone).endOf('day').toDate();
 
       const dailyData = await Model.aggregate([
         {
@@ -74,15 +67,13 @@ const summaryMilkProduction = async (Model, req, res) => {
     const dailyMilkProductionData = await Promise.all(dailyMilkProductionPromises);
 
     // New logic to calculate daily milk production for this month
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const currentMonth = dayjs().tz(istTimeZone).month();
+    const currentYear = dayjs().tz(istTimeZone).year();
+    const daysInMonth = dayjs().tz(istTimeZone).daysInMonth();
 
     const dailyMilkProductionThisMonthPromises = Array.from({ length: daysInMonth }, (_, day) => {
-      const dayStart = new Date(currentYear, currentMonth, day + 1);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(currentYear, currentMonth, day + 1);
-      dayEnd.setHours(23, 59, 59, 999);
+      const dayStart = dayjs().tz(istTimeZone).date(day + 1).startOf('day').toDate();
+      const dayEnd = dayjs().tz(istTimeZone).date(day + 1).endOf('day').toDate();
 
       return Model.aggregate([
         {
@@ -174,8 +165,8 @@ const summaryMilkProduction = async (Model, req, res) => {
         },
         totalThisWeek: {
           ...totalThisWeek,
-          expectedMilk: totalThisWeek.totalMilk > 0 ? (expectedMilkPerDay * Math.min(7, new Date().getDay() + 1)) : 0, // Adjusted based on days in the week
-          expectedSilage: totalThisWeek.totalSilage > 0 ? (expectedSilagePerDay * Math.min(7, new Date().getDay() + 1)) : 0,
+          expectedMilk: totalThisWeek.totalMilk > 0 ? (expectedMilkPerDay * Math.min(7, dayjs().tz(istTimeZone).day() + 1)) : 0, // Adjusted based on days in the week
+          expectedSilage: totalThisWeek.totalSilage > 0 ? (expectedSilagePerDay * Math.min(7, dayjs().tz(istTimeZone).day() + 1)) : 0,
         },
         totalMorning: summaryData[0].totalMorning.length > 0 ? { ...summaryData[0].totalMorning[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
         totalEvening: summaryData[0].totalEvening.length > 0 ? { ...summaryData[0].totalEvening[0], expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 } : { totalMilk: 0, totalSilage: 0, expectedMilk: expectedMilkPerDay / 2, expectedSilage: expectedSilagePerDay / 2 },
@@ -189,7 +180,7 @@ const summaryMilkProduction = async (Model, req, res) => {
       chart: {
         dailyMilkProduction: dailyMilkProductionData, // Daily production data for the week
         dailyMilkProductionThisMonth: dailyMilkProductionThisMonthData, // Daily production data for the month
-        dailySilageUsage: dailySilageUsagedata ,
+        dailySilageUsage: dailySilageUsagedata,
       }
     };
 

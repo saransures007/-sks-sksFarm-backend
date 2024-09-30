@@ -1,9 +1,13 @@
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+
 const cowMilkProduction = async (Model, req, res) => {
   const { cowId, liter, snf, fat, silage, entryDate, addedBy } = req.body;
 
   console.log("creating milk production");
   // Ensure all required fields are provided
-  if (!cowId || !liter || !snf || !fat || !silage || !entryDate || !addedBy ) {
+  if (!cowId || !liter || !snf || !fat || !silage || !entryDate || !addedBy) {
     return res.status(400).json({
       success: false,
       message: 'All fields are required.',
@@ -11,6 +15,8 @@ const cowMilkProduction = async (Model, req, res) => {
   }
 
   try {
+    // Convert entryDate to UTC using dayjs
+    const utcEntryDate = dayjs(entryDate).utc().toISOString(); // Convert to ISO string in UTC format
     // Create a new milk entry
     const milkEntry = new Model({
       cowId,
@@ -18,7 +24,7 @@ const cowMilkProduction = async (Model, req, res) => {
       snf,
       fat,
       silage,
-      entryDate,
+      entryDate: utcEntryDate, // Use the converted UTC date
       addedBy,
     });
 
