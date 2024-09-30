@@ -41,6 +41,7 @@ const authUser = async (req, res, { user, databasePassword, password, UserPasswo
     })
     .json({
       success: true,
+      token, 
       result: {
         _id: user._id,
         name: user.name,
