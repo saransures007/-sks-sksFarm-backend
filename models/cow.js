@@ -16,6 +16,9 @@ const cowSchema = new mongoose.Schema({
     required: true,
     unique: true, // Ensures each RFID key is unique
   },
+  name: {
+    type: String,
+  },
   breed: {
     type: String,
     required: true,
@@ -23,6 +26,9 @@ const cowSchema = new mongoose.Schema({
   entryDate: {
     type: Date,
     required: true,
+  },
+  purchasedAmount: {
+    type: Number, // Date when the cow was sold, if applicable
   },
   origin: {
     type: String,
@@ -45,11 +51,14 @@ const cowSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ['Cow', 'Bull'], // Gender can be 'cow' or 'Bull'
+    enum: ['Cow', 'Bull','calf'], // Gender can be 'cow' or 'Bull'
     required: true,
   },
   soldDate: {
     type: Date, // Date when the cow was sold, if applicable
+  },
+  soldAmount: {
+    type: Number, // Date when the cow was sold, if applicable
   },
   isMilking: {
     type: Boolean,

@@ -149,6 +149,76 @@ const summaryMilkProduction = async (Model, req, res) => {
         },
       },
     ]);
+    const totalMilkProductionByCow = await Model.aggregate([
+      {
+        $group: {
+          _id: "$cowId", // Assuming you have a cowId field to group by
+          totalMilk: { $sum: '$liter' }, // Lifetime total milk production
+          today: { 
+            $sum: { 
+              $cond: [
+                { $gte: ['$entryDate', todayStart] }, // Milk produced from start of today onwards
+                '$liter', 
+                0 
+              ] 
+            }
+          },
+          week: { 
+            $sum: { 
+              $cond: [
+                { $gte: ['$entryDate', weekStart] }, // Milk produced from start of this week onwards
+                '$liter', 
+                0 
+              ] 
+            }
+          },
+          month: { 
+            $sum: { 
+              $cond: [
+                { $gte: ['$entryDate', dayjs().tz(istTimeZone).startOf('month').toDate()] }, // Milk produced from start of this month onwards
+                '$liter', 
+                0 
+              ] 
+            }
+          },
+          year: { 
+            $sum: { 
+              $cond: [
+                { $gte: ['$entryDate', dayjs().tz(istTimeZone).startOf('year').toDate()] }, // Milk produced from start of this year onwards
+                '$liter', 
+                0 
+              ] 
+            }
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'cows', // Replace 'cows' with your actual collection name for cows
+          localField: '_id',
+          foreignField: '_id',
+          as: 'cowDetails',
+        },
+      },
+      {
+        $unwind: '$cowDetails',
+      },
+      {
+        $project: {
+          uid: '$_id',
+          id: '$cowDetails.id',
+          name: '$cowDetails.name', // Assuming there's a name field in your cows collection
+          totalMilk: {
+            today: '$today',
+            week: '$week',
+            month: '$month',
+            year: '$year',
+            total: '$totalMilk', // Overall lifetime milk production
+          },
+        },
+      },
+    ]);
+    
 
     const expectedMilkPerDay = 80; // Dummy value for expected milk per day
     const expectedSilagePerDay = 200; // Dummy value for expected silage per day  
@@ -181,6 +251,7 @@ const summaryMilkProduction = async (Model, req, res) => {
         dailyMilkProduction: dailyMilkProductionData, // Daily production data for the week
         dailyMilkProductionThisMonth: dailyMilkProductionThisMonthData, // Daily production data for the month
         dailySilageUsage: dailySilageUsagedata,
+        totalMilkProductionByCow: totalMilkProductionByCow,
       }
     };
 

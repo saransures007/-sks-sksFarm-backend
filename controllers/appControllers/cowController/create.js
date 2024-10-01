@@ -5,6 +5,7 @@ const createCow = async (Model, req, res) => {
     rfidKey,
     breed,
     entryDate,
+    purchasedAmount,
     origin,
     motherId,
     expectedLiter,
@@ -12,6 +13,7 @@ const createCow = async (Model, req, res) => {
     birthDate,
     gender,
     soldDate, 
+    soldAmount,
     isMilking, 
     breedingStartDate, 
     breedingEndDate, 
@@ -20,7 +22,7 @@ const createCow = async (Model, req, res) => {
   console.log("req.body",req.body)
 
   // Ensure required fields are provided
-  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender ||isMilking) {
+  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender || !isMilking || !purchasedAmount) {
     return res.status(400).json({
       success: false,
       message: 'All fields are required except soldDate, isMilking.',

@@ -6,8 +6,10 @@ exports.migrate = (result) => {
   newData.id = result.id;
   newData.earTagNumber = result.earTagNumber;
   newData.rfidKey = result.rfidKey;
+  newData.name = result.name;  
   newData.breed = result.breed;
   newData.entryDate = result.entryDate;
+  newData.purchasedAmount = result.purchasedAmount;
   newData.origin = result.origin;
   newData.motherId = result.motherId;
   newData.expectedLiter = result.expectedLiter;
@@ -15,6 +17,7 @@ exports.migrate = (result) => {
   newData.birthDate = result.birthDate;
   newData.gender = result.gender;
   newData.soldDate = result.soldDate;
+  newData.soldAmount = result.soldAmount;
   newData.createdAt = result.createdAt;
   newData.isMilking = result.isMilking;
   newData.breedingStartDate = result.breedingStartDate;
