@@ -104,7 +104,7 @@ const summary = async (Model, req, res) => {
               $group: {
                 _id: { 
                   date: { 
-                    $dateToString: { format: "%b %d", date: "$entryDate" } 
+                    $dateToString: { format: "%b %d %Y", date: "$entryDate" } 
                   }
                 },
                 totalMilk: { $sum: '$totalMilk' },
