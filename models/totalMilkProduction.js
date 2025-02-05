@@ -17,8 +17,16 @@ const TotalMilkProductionSchema = new mongoose.Schema({
     type: Number, // Average Fat value
     required: true,
   },
+  ratePerLiter: {
+    type: Number, // rate/liter value
+    required: true,
+  },
   addedBy: {
     type: String,
+    required: true,
+  },
+  lastUpdated: {
+    type: Date,
     required: true,
   },
   createdAt: {

@@ -5,7 +5,7 @@ const fs = require('fs');
 const { generate: uniqueId } = require('shortid');
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.DATABASE)
+mongoose.connect(process.env.DEV_DATABASE)
   .then(() => {
     console.log('MongoDB connection established');
     setupApp(); // Call setupApp after connection is established
@@ -24,8 +24,8 @@ async function setupApp() {
     const passwordHash = newAdminPassword.generateHash(salt, 'admin123');
 
     const demoAdmin = {
-      email: 'admin@demo.com',
-      name: 'IDURAR',
+      email: 'saransuresh1999@gmail.com',
+      name: 'Saran',
       surname: 'admin',
       enabled: true,
       role: 'owner',

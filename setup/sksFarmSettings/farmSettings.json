@@ -1,0 +1,111 @@
+[
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "expected_silage_per_day",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "expected_milk_per_day",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "expected_feed_pellets_per_day",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "expected_feed_tmr_per_day",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "rate_of_milk_per_liter",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "monthly_operational_cost",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "expected_monthly_income",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "profit_margin",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "total_profit",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "loan_amount",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "loan_paid",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "loan_balance",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "loan_interest_rate",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "monthly_loan_payment",
+        "settingValue": 0,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "farm_name",
+        "settingValue": "",
+        "valueType": "string"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "farm_location",
+        "settingValue": "",
+        "valueType": "string"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "date_of_establishment",
+        "settingValue": "2024-01-21T00:00:00.000Z",
+        "valueType": "date"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "remarks",
+        "settingValue": "",
+        "valueType": "string"
+    }
+  ]
+  

@@ -1,8 +1,8 @@
 const create = async (Model, req, res) => {
-  const { entryDate, totalMilk, avgSnf, avgFat, addedBy } = req.body;
+  const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body;
 
   // Ensure required fields are provided
-  if (!entryDate || !totalMilk || !avgSnf || !avgFat || !addedBy) {
+  if (!entryDate || !totalMilk || !avgSnf || !avgFat || !ratePerLiter || !addedBy) {
     return res.status(400).json({
       success: false,
       message: 'All fields are required.',
@@ -15,7 +15,9 @@ const create = async (Model, req, res) => {
       totalMilk,
       avgSnf,
       avgFat,
+      ratePerLiter,
       addedBy,
+      lastUpdated: Date.now(),
     });
 
     const result = await totalMilkProduction.save();

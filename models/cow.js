@@ -71,9 +71,13 @@ const cowSchema = new mongoose.Schema({
   breedingEndDate: {
     type: Date, // Date when breeding ends
   },
+  lastUpdated: {
+    type: Date,
+    required: true,
+  },
   createdAt: {
     type: Date,
-    default: Date.now,
+    default: Date.now, // Automatically set the current date and time
   },
 });
 

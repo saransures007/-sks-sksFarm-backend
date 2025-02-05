@@ -17,13 +17,23 @@ const milkSchema = new mongoose.Schema({
   },
   snf: {
     type: Number,
-    required: true,
   },
   fat: {
     type: Number,
-    required: true,
   },
   silage: {
+    type: Number,
+    required: true,
+  },
+  tmrFeed: {
+    type: Number,
+    required: true,
+  },
+  pelletsFeed: {
+    type: Number,
+    required: true,
+  },
+  dryFodder: {
     type: Number,
     required: true,
   },
@@ -31,9 +41,13 @@ const milkSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  lastUpdated: {
+    type: Date,
+    required: true,
+  },
   createdAt: {
     type: Date,
-    default: Date.now,
+    default: Date.now, // Automatically set the current date and time
   },
 });
 

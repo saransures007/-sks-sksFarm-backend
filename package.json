@@ -23,6 +23,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "currency.js": "2.0.4",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "dayjs-plugin-utc": "^0.1.2",
     "dotenv": "16.3.1",

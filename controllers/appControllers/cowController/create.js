@@ -1,9 +1,12 @@
+const { date } = require("joi");
+
 const createCow = async (Model, req, res) => {
   const {
     id,
     earTagNumber,
     rfidKey,
     breed,
+    name,
     entryDate,
     purchasedAmount,
     origin,
@@ -22,7 +25,7 @@ const createCow = async (Model, req, res) => {
   console.log("req.body",req.body)
 
   // Ensure required fields are provided
-  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender || !isMilking || !purchasedAmount) {
+  if (!id || !earTagNumber || !rfidKey || !breed || !entryDate || !origin || !expectedLiter || !addedBy || !birthDate || !gender  || !purchasedAmount) {
     return res.status(400).json({
       success: false,
       message: 'All fields are required except soldDate, isMilking.',
@@ -34,6 +37,7 @@ const createCow = async (Model, req, res) => {
       id,
       earTagNumber,
       rfidKey,
+      name,
       breed,
       entryDate,
       origin,
@@ -44,8 +48,11 @@ const createCow = async (Model, req, res) => {
       gender,
       soldDate, 
       isMilking,
+      purchasedAmount,
       breedingStartDate, 
       breedingEndDate,
+      soldAmount,
+      lastUpdated: Date.now(),
     });
 
     const result = await newCow.save();

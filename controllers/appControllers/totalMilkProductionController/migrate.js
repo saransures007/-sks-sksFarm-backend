@@ -5,7 +5,10 @@ exports.migrate = (result) => {
   newData.totalMilk = result.totalMilk;
   newData.avgSnf = result.avgSnf;
   newData.avgFat = result.avgFat;
+  newData.ratePerLiter = result.ratePerLiter;
+  newData.TotalAmount = result.ratePerLiter * result.totalMilk;
   newData.addedBy = result.addedBy;
+  newData.lastUpdated = result.lastUpdated;
   newData.createdAt = result.createdAt;
 
   // Additional fields can be added if necessary

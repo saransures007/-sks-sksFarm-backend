@@ -8,6 +8,10 @@ exports.migrate = (result) => {
   newData.entryDate = result.entryDate;
   newData.snf = result.snf;
   newData.fat = result.fat;
+  newData.silage =   result.silage;
+  newData.pelletsFeed =result.pelletsFeed;
+  newData.dryFodder = result.dryFodder;
+  newData.tmrFeed =  result.tmrFeed;
   newData.addedBy = result.addedBy;
   newData.createdAt = result.createdAt;
 

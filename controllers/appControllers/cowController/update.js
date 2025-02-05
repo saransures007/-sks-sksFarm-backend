@@ -1,5 +1,6 @@
 const update = async (Model, req, res) => {
   const { id } = req.params;
+  req.body.lastUpdated = Date.now();
   const updateData = req.body;
 
   try {

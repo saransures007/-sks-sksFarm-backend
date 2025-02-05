@@ -2,12 +2,23 @@ require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(process.env.DEV_DATABASE);
 
 async function deleteData() {
   const admin = require('../models/admin');
   const adminPassword = require('../models/adminPassword');
   const setting = require('../models/setting');
+
+
+  const cowExamination = require('../models/cowExamination');
+  await cowExamination.deleteMany();
+  console.log('👍 cowExamination Deleted. To setup demo cowExamination data, run\n\n\t npm run setup\n\n');
+   
+
+  const cowExpense = require('../models/cowExpense');
+  await cowExpense.deleteMany();
+  console.log('👍 cowExpense Deleted. To setup demo cowExpense data, run\n\n\t npm run setup\n\n');
+   
 
   const totalMilkProduction = require('../models/totalMilkProduction');
   await totalMilkProduction.deleteMany();

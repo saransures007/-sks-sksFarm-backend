@@ -1,5 +1,6 @@
 const update = async (Model, req, res) => {
   const { id } = req.params;
+  req.body.lastUpdated = Date.now();
 
   try {
     const result = await Model.findByIdAndUpdate(id, req.body, {

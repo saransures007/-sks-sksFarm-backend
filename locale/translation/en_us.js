@@ -280,6 +280,7 @@ module.exports = {
   new_password: 'New Password',
   confirm_password: 'Confirm Password',
   general_settings: 'General Settings',
+  farm_settings: 'Farm Settings',
   company_settings: 'Company Settings',
   company_logo: 'Company Logo',
   currency_settings: 'Currency Settings',
