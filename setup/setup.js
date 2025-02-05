@@ -5,7 +5,7 @@ const fs = require('fs');
 const { generate: uniqueId } = require('shortid');
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.DEV_DATABASE)
+mongoose.connect(process.env.PROD_DATABASE)
   .then(() => {
     console.log('MongoDB connection established');
     setupApp(); // Call setupApp after connection is established

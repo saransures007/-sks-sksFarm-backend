@@ -2,7 +2,7 @@ require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DEV_DATABASE);
+mongoose.connect(process.env.PROD_DATABASE);
 
 async function deleteData() {
   const admin = require('../models/admin');

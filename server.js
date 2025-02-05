@@ -37,7 +37,7 @@ if (major < 20) {
 require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 
-const dbUri = process.env.DEV_DATABASE;
+const dbUri = process.env.PROD_DATABASE;
 
 // Function to load models after connecting to MongoDB
 async function loadModels() {
