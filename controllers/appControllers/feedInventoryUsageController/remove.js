@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const FeedStockLevels = mongoose.model('feedStockLevels'); // Model for feed stock levels
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const remove = async (Model, req, res) => {
   const { id } = req.params;
@@ -11,6 +13,16 @@ const remove = async (Model, req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Feed inventory usage entry not found.',
+      });
+    }
+
+    const createdAtTime = new Date(entry.createdAt).getTime();
+    const currentTime = Date.now();
+    
+    if (currentTime - createdAtTime > ONE_HOUR) {
+      return res.status(400).json({
+        success: false,
+        message: 'Time expired 1Hrs. Entry cannot be deleted.',
       });
     }
 

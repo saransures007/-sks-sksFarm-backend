@@ -41,6 +41,10 @@ const cowSchema = new mongoose.Schema({
     type: Number, // Milk quantity in liters (or ml)
     required: true,
   },
+  weight: {
+    type: Number, // Milk quantity in liters (or ml)
+    required: true,
+  },
   addedBy: {
     type: String,
     required: true,

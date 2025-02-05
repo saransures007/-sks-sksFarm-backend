@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const FeedStockLevels = mongoose.model('feedStockLevels'); // Model for feed stock levels
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 const update = async (Model, req, res) => {
   const { id } = req.params;
@@ -17,6 +18,17 @@ const update = async (Model, req, res) => {
         message: 'Entry not found.',
       });
     }
+
+    const createdAtTime = new Date(entry.createdAt).getTime();
+    const currentTime = Date.now();
+    
+    if (currentTime - createdAtTime > TWENTY_FOUR_HOURS) {
+      return res.status(400).json({
+        success: false,
+        message: 'Time expired. Entry cannot be edited.',
+      });
+    }
+    
 
     // Extract feedType, new quantity, and cost per unit from the request body
     const { feedType, quantity: newQuantity, totalCost } = req.body;

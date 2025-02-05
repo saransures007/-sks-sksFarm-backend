@@ -1,4 +1,3 @@
-const { result } = require('lodash');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -7,9 +6,12 @@ const mongoose = require('mongoose');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// Models
 const feedInventoryModel = mongoose.model('feedInventory');
+const feedInventoryUsageModel = mongoose.model('feedInventoryUsage');
 const cowExpenseModel = mongoose.model('cowExpense');
 
+// Expense Summary Function
 const summaryFarmExpense = async (model, req, res) => {
   try {
     const istTimeZone = 'Asia/Kolkata'; // IST Timezone
@@ -19,7 +21,7 @@ const summaryFarmExpense = async (model, req, res) => {
     const startOfMonth = dayjs().tz(istTimeZone).startOf('month').toDate();
     const startOfYear = dayjs().tz(istTimeZone).startOf('year').toDate();
 
-    // Aggregate function for expenses
+    // Helper function to aggregate expenses
     const aggregateExpense = async (Model, filter) => {
       return await Model.aggregate([
         { $match: filter },
@@ -27,7 +29,7 @@ const summaryFarmExpense = async (model, req, res) => {
       ]);
     };
 
-    // Get expenses for different periods
+    // Get expenses data: overall, yearly, monthly, and weekly
     const getExpense = async (Model) => {
       const overall = await aggregateExpense(Model, {});
       const yearly = await aggregateExpense(Model, { date: { $gte: startOfYear } });
@@ -42,10 +44,268 @@ const summaryFarmExpense = async (model, req, res) => {
       };
     };
 
-    // Get expenses for each model
+    // Function to calculate average cost per unit for feed inventory
+    const getAverageCostPerUnit = async () => {
+      const inventory = await feedInventoryModel.aggregate([
+        { $match: { date: { $gte: startOfMonth } } },
+        {
+          $group: {
+            _id: "$feedType",
+            totalCost: { $sum: { $multiply: ["$costPerUnit", "$quantity"] } },
+            totalQuantity: { $sum: "$quantity" }
+          }
+        },
+        {
+          $project: {
+            feedType: "$_id",
+            avgCostPerUnit: { $cond: [{ $gt: ["$totalQuantity", 0] }, { $divide: ["$totalCost", "$totalQuantity"] }, 0] }
+          }
+        }
+      ]);
+
+      return inventory.reduce((acc, item) => {
+        acc[item.feedType] = item.avgCostPerUnit;
+        return acc;
+      }, {});
+    };
+
+// Calculate feed inventory usage expense
+// const calculateFeedInventoryUsageExpense = async () => {
+//   const avgCostPerUnitMap = await getAverageCostPerUnit();
+//   const usageData = await feedInventoryUsageModel.aggregate([
+//     { $match: { date: { $gte: startOfMonth } } },
+//     {
+//       $group: {
+//         _id: {
+//           day: {
+//             $dateToString: { 
+//               format: "%b %d", 
+//               date: { $toDate: "$date" },
+//               timezone: istTimeZone // Convert to IST timezone
+//             }
+//           },
+//           feedType: "$feedType"
+//         },
+//         totalUsed: { $sum: "$quantityUsed" }
+//       }
+//     },
+//     {
+//       $project: {
+//         _id: 0,
+//         day: "$_id.day",
+//         feedType: "$_id.feedType",
+//         totalUsed: 1
+//       }
+//     },
+//     {
+//       $sort: { day: 1, feedType: 1 } // Sort by day and feedType to group them properly
+//     }
+//   ]);
+
+//   // Format the result
+//   const result = usageData.reduce((acc, item) => {
+//     const { day, feedType, totalUsed } = item;
+//     const avgCost = avgCostPerUnitMap[feedType] || 0;
+//     const cost = totalUsed * avgCost;
+
+//     if (!acc[day]) {
+//       acc[day] = { date: `${day} 2025`, feeds: {}, totalCost: 0 };  // Format the date properly
+//     }
+
+//     acc[day].feeds[feedType] = {
+//       totalUsed,
+//       cost
+//     };
+//     acc[day].totalCost += cost;
+
+//     return acc;
+//   }, {});
+
+//   // Convert the object into an array
+//   const formattedResult = Object.keys(result).map(key => result[key]);
+
+//   // Calculate daily, weekly, and monthly totals
+//   const totalToday = formattedResult.filter(item => dayjs(item.date).tz(istTimeZone).isSame(dayjs().tz(istTimeZone).startOf('day'), 'day'));
+//   const totalThisWeek = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('week'), 'week'));
+//   const totalThisMonth = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('month'), 'month'));
+
+
+//   console.log("totalToday", totalToday)
+//       const totalCostToday = totalToday.reduce((acc, item) => {
+//         // Sum the totalUsed values for all feeds
+//         const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
+//         return acc + totalCostForDay;
+//       }, 0);
+//       const totalUsedToday = totalToday.reduce((acc, item) => {
+//         // Sum the totalUsed values for all feeds
+//         const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
+//         return acc + totalUsedForDay;
+//       }, 0);
+
+//     // Calculate weekly and monthly totals
+//     const totalCostThisWeek = totalThisWeek.reduce((acc, item) => {
+//       // Sum the totalUsed values for all feeds
+//       const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
+//       return acc + totalCostForDay;
+//     }, 0);
+
+// const totalCostThisMonth = totalThisMonth.reduce((acc, item) => {
+//   // Sum the totalUsed values for all feeds
+//   const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
+//   return acc + totalCostForDay;
+// }, 0);
+
+// // Calculating totalUsed for the respective time periods
+// const totalUsedThisWeek = totalThisWeek.reduce((acc, item) => {
+//   const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
+//   return acc + totalUsedForDay;
+// }, 0);
+
+// const totalUsedThisMonth = totalThisMonth.reduce((acc, item) => {
+//   const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
+//   return acc + totalUsedForDay;
+// }, 0);
+
+// // Return the final result with updated totalUsed and cost values
+// return {
+//   feedInventoryUsageExpense: {
+//     DailyUsageData: formattedResult,
+//     TotalToday: {
+//       totalUsed: totalUsedToday,
+//       cost: totalCostToday
+//     },
+//     TotalThisWeek: {
+//       totalUsed: totalUsedThisWeek, // Updated to sum the `totalUsed` values for the week
+//       cost: totalCostThisWeek
+//     },
+//     TotalThisMonth: {
+//       totalUsed: totalUsedThisMonth, // Updated to sum the `totalUsed` values for the month
+//       cost: totalCostThisMonth
+//     }
+//   }
+//   };
+// };
+
+// Function to calculate feed inventory usage expense
+const calculateFeedInventoryUsageExpense = async () => {
+  const avgCostPerUnitMap = await getAverageCostPerUnit();
+  const usageData = await feedInventoryUsageModel.aggregate([
+    { $match: { date: { $gte: startOfMonth } } },
+    {
+      $group: {
+        _id: {
+          day: {
+            $dateToString: { 
+              format: "%b %d", 
+              date: { $toDate: "$date" },
+              timezone: istTimeZone // Convert to IST timezone
+            }
+          },
+          feedType: "$feedType"
+        },
+        totalUsed: { $sum: "$quantityUsed" }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        day: "$_id.day",
+        feedType: "$_id.feedType",
+        totalUsed: 1
+      }
+    },
+    {
+      $sort: { day: 1, feedType: 1 } // Sort by day and feedType to group them properly
+    }
+  ]);
+
+  // Format the result
+  const result = usageData.reduce((acc, item) => {
+    const { day, feedType, totalUsed } = item;
+    const avgCost = avgCostPerUnitMap[feedType] || 0;
+    const cost = totalUsed * avgCost;
+
+    if (!acc[day]) {
+      acc[day] = { date: `${day} 2025`, feeds: {}, totalCost: 0 };  // Format the date properly
+    }
+
+    acc[day].feeds[feedType] = {
+      totalUsed,
+      cost
+    };
+    acc[day].totalCost += cost;
+
+    return acc;
+  }, {});
+
+  // Convert the object into an array
+  const formattedResult = Object.keys(result).map(key => result[key]);
+
+  // Calculate daily, weekly, and monthly totals by feed type
+  const calculateFeedTotal = (feedType, data) => {
+    return data.reduce((acc, item) => {
+      const feed = item.feeds[feedType];
+      if (feed) {
+        acc.totalUsed += feed.totalUsed;
+        acc.cost += feed.cost;
+      }
+      return acc;
+    }, { totalUsed: 0, cost: 0 });
+  };
+
+  const totalToday = formattedResult.filter(item => dayjs(item.date).tz(istTimeZone).isSame(dayjs().tz(istTimeZone).startOf('day'), 'day'));
+  const totalThisWeek = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('week'), 'week'));
+  const totalThisMonth = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('month'), 'month'));
+
+  // Calculate feed totals for today, this week, and this month
+  const totalSilageToday = calculateFeedTotal('Silage', totalToday);
+  const totalTMRFeedToday = calculateFeedTotal('TMR Feed', totalToday);
+  const totalPelletFeedToday = calculateFeedTotal('Pellet Feed', totalToday);
+
+  const totalSilageThisWeek = calculateFeedTotal('Silage', totalThisWeek);
+  const totalTMRFeedThisWeek = calculateFeedTotal('TMR Feed', totalThisWeek);
+  const totalPelletFeedThisWeek = calculateFeedTotal('Pellet Feed', totalThisWeek);
+
+  const totalSilageThisMonth = calculateFeedTotal('Silage', totalThisMonth);
+  const totalTMRFeedThisMonth = calculateFeedTotal('TMR Feed', totalThisMonth);
+  const totalPelletFeedThisMonth = calculateFeedTotal('Pellet Feed', totalThisMonth);
+
+  // Return the final result with updated totalUsed and cost values by feed type
+  return {
+      DailyUsageData: formattedResult,
+      TotalToday: {
+        Silage: totalSilageToday,
+        TMRfeed: totalTMRFeedToday,
+        PelletFeed:totalPelletFeedToday,
+        totalcost:totalSilageToday.cost + totalTMRFeedToday.cost +totalPelletFeedToday.cost
+      },
+      TotalThisWeek: {
+        Silage: totalSilageThisWeek,
+        TMRfeed: totalTMRFeedThisWeek,
+        PelletFeed:totalPelletFeedThisWeek,
+        totalcost:totalSilageThisWeek.cost + totalTMRFeedThisWeek.cost + totalPelletFeedThisWeek.cost
+      },
+      TotalThisMonth: {
+        Silage: totalSilageThisMonth,
+        TMRfeed: totalTMRFeedThisMonth,
+        PelletFeed:totalPelletFeedThisMonth,
+        totalcost:totalSilageThisMonth.cost + totalTMRFeedThisMonth.cost +totalPelletFeedThisMonth.cost
+      }
+    
+  };
+};
+
+    
+    
+
+    // Get different expense data
     const cowExpense = await getExpense(cowExpenseModel);
-    const feedInventoryExpense = await getExpense(feedInventoryModel,'create');
-    const farmExpense = await getExpense(model,'lastUpdated');
+    const feedInventoryExpense = await getExpense(feedInventoryModel);
+    const farmExpense = await getExpense(model);
+
+    // Calculate feed usage expense
+    const feedInventoryUsageExpense = await calculateFeedInventoryUsageExpense();
+
 
     // Calculate total expenses
     const totalExpense = {
@@ -58,6 +318,7 @@ const summaryFarmExpense = async (model, req, res) => {
     return res.status(200).json({
       success: true,
       result: {
+        feedInventoryUsageExpense,
         cowExpense,
         feedInventoryExpense,
         farmExpense,

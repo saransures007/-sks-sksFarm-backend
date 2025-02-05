@@ -167,6 +167,7 @@ const summary = async (Model, req, res) => {
           totalMilk: item.totalMilk?.toFixed(2) || '0.00',
           avgSnf: item.avgSnf?.toFixed(2) || '0.00',
           avgFat: item.avgFat?.toFixed(2) || '0.00',
+          income: (item.totalMilk * item.ratePerLiter).toFixed(2) || '0.00',
           ratePerLiter: item.ratePerLiter?.toFixed(2) || '0.00',
         })),
         monthByMonthThisYear: result.monthByMonthThisYear || [],

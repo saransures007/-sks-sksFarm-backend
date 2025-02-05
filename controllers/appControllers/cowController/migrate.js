@@ -13,6 +13,7 @@ exports.migrate = (result) => {
   newData.origin = result.origin;
   newData.motherId = result.motherId;
   newData.expectedLiter = result.expectedLiter;
+  newData.weight = result.weight;
   newData.addedBy = result.addedBy;
   newData.birthDate = result.birthDate;
   newData.gender = result.gender;
