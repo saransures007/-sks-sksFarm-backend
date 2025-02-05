@@ -20,7 +20,7 @@ const summaryFarmExpense = async (model, req, res) => {
     const startOfWeek = dayjs().tz(istTimeZone).startOf('week').toDate();
     const startOfMonth = dayjs().tz(istTimeZone).startOf('month').toDate();
     const startOfYear = dayjs().tz(istTimeZone).startOf('year').toDate();
-
+    
     // Helper function to aggregate expenses
     const aggregateExpense = async (Model, filter) => {
       return await Model.aggregate([
@@ -226,7 +226,7 @@ const calculateFeedInventoryUsageExpense = async () => {
     const cost = totalUsed * avgCost;
 
     if (!acc[day]) {
-      acc[day] = { date: `${day} 2025`, feeds: {}, totalCost: 0 };  // Format the date properly
+      acc[day] = { date: `${day} ${new Date().getFullYear()}`, feeds: {}, totalCost: 0 };  // Format the date properly
     }
 
     acc[day].feeds[feedType] = {
