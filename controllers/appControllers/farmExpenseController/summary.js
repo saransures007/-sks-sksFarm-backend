@@ -157,6 +157,8 @@ const calculateFeedInventoryUsageExpense = async () => {
   // Return the final result with updated totalUsed and cost values by feed type
   return {
       DailyUsageData: formattedResult,
+      testtotalToday:totalToday,
+      testtotalThisMonth:totalThisMonth,
       TotalToday: {
         Silage: totalSilageToday,
         TMRfeed: totalTMRFeedToday,
