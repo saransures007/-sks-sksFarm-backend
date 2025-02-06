@@ -137,10 +137,20 @@ const calculateFeedInventoryUsageExpense = async () => {
   };
   console.log("formattedResult", formattedResult)
 
-  const totalToday = formattedResult.filter(item => dayjs(item.date).tz(istTimeZone).isSame(dayjs().tz(istTimeZone).startOf('day'), 'day'));
-  const totalThisWeek = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('week'), 'week'));
-  const totalThisMonth = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('month'), 'month'));
-
+  const totalToday = formattedResult.filter(item => 
+    dayjs(item.date, "MMM DD YYYY").tz(istTimeZone)
+      .isSame(dayjs().tz(istTimeZone).startOf('day'), 'day')
+  );
+  
+  const totalThisWeek = formattedResult.filter(item => 
+    dayjs(item.date, "MMM DD YYYY").tz(istTimeZone)
+      .isSame(dayjs().tz(istTimeZone).startOf('week'), 'week')
+  );
+  
+  const totalThisMonth = formattedResult.filter(item => 
+    dayjs(item.date, "MMM DD YYYY").tz(istTimeZone)
+      .isSame(dayjs().tz(istTimeZone).startOf('month'), 'month')
+  );
   // Calculate feed totals for today, this week, and this month
   const totalSilageToday = calculateFeedTotal('Silage', totalToday);
   const totalTMRFeedToday = calculateFeedTotal('TMR Feed', totalToday);
