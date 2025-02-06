@@ -69,123 +69,6 @@ const summaryFarmExpense = async (model, req, res) => {
       }, {});
     };
 
-// Calculate feed inventory usage expense
-// const calculateFeedInventoryUsageExpense = async () => {
-//   const avgCostPerUnitMap = await getAverageCostPerUnit();
-//   const usageData = await feedInventoryUsageModel.aggregate([
-//     { $match: { date: { $gte: startOfMonth } } },
-//     {
-//       $group: {
-//         _id: {
-//           day: {
-//             $dateToString: { 
-//               format: "%b %d", 
-//               date: { $toDate: "$date" },
-//               timezone: istTimeZone // Convert to IST timezone
-//             }
-//           },
-//           feedType: "$feedType"
-//         },
-//         totalUsed: { $sum: "$quantityUsed" }
-//       }
-//     },
-//     {
-//       $project: {
-//         _id: 0,
-//         day: "$_id.day",
-//         feedType: "$_id.feedType",
-//         totalUsed: 1
-//       }
-//     },
-//     {
-//       $sort: { day: 1, feedType: 1 } // Sort by day and feedType to group them properly
-//     }
-//   ]);
-
-//   // Format the result
-//   const result = usageData.reduce((acc, item) => {
-//     const { day, feedType, totalUsed } = item;
-//     const avgCost = avgCostPerUnitMap[feedType] || 0;
-//     const cost = totalUsed * avgCost;
-
-//     if (!acc[day]) {
-//       acc[day] = { date: `${day} 2025`, feeds: {}, totalCost: 0 };  // Format the date properly
-//     }
-
-//     acc[day].feeds[feedType] = {
-//       totalUsed,
-//       cost
-//     };
-//     acc[day].totalCost += cost;
-
-//     return acc;
-//   }, {});
-
-//   // Convert the object into an array
-//   const formattedResult = Object.keys(result).map(key => result[key]);
-
-//   // Calculate daily, weekly, and monthly totals
-//   const totalToday = formattedResult.filter(item => dayjs(item.date).tz(istTimeZone).isSame(dayjs().tz(istTimeZone).startOf('day'), 'day'));
-//   const totalThisWeek = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('week'), 'week'));
-//   const totalThisMonth = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('month'), 'month'));
-
-
-//   console.log("totalToday", totalToday)
-//       const totalCostToday = totalToday.reduce((acc, item) => {
-//         // Sum the totalUsed values for all feeds
-//         const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
-//         return acc + totalCostForDay;
-//       }, 0);
-//       const totalUsedToday = totalToday.reduce((acc, item) => {
-//         // Sum the totalUsed values for all feeds
-//         const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
-//         return acc + totalUsedForDay;
-//       }, 0);
-
-//     // Calculate weekly and monthly totals
-//     const totalCostThisWeek = totalThisWeek.reduce((acc, item) => {
-//       // Sum the totalUsed values for all feeds
-//       const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
-//       return acc + totalCostForDay;
-//     }, 0);
-
-// const totalCostThisMonth = totalThisMonth.reduce((acc, item) => {
-//   // Sum the totalUsed values for all feeds
-//   const totalCostForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.cost, 0);
-//   return acc + totalCostForDay;
-// }, 0);
-
-// // Calculating totalUsed for the respective time periods
-// const totalUsedThisWeek = totalThisWeek.reduce((acc, item) => {
-//   const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
-//   return acc + totalUsedForDay;
-// }, 0);
-
-// const totalUsedThisMonth = totalThisMonth.reduce((acc, item) => {
-//   const totalUsedForDay = Object.values(item.feeds).reduce((feedAcc, feed) => feedAcc + feed.totalUsed, 0);
-//   return acc + totalUsedForDay;
-// }, 0);
-
-// // Return the final result with updated totalUsed and cost values
-// return {
-//   feedInventoryUsageExpense: {
-//     DailyUsageData: formattedResult,
-//     TotalToday: {
-//       totalUsed: totalUsedToday,
-//       cost: totalCostToday
-//     },
-//     TotalThisWeek: {
-//       totalUsed: totalUsedThisWeek, // Updated to sum the `totalUsed` values for the week
-//       cost: totalCostThisWeek
-//     },
-//     TotalThisMonth: {
-//       totalUsed: totalUsedThisMonth, // Updated to sum the `totalUsed` values for the month
-//       cost: totalCostThisMonth
-//     }
-//   }
-//   };
-// };
-
 // Function to calculate feed inventory usage expense
 const calculateFeedInventoryUsageExpense = async () => {
   const avgCostPerUnitMap = await getAverageCostPerUnit();
@@ -252,6 +135,7 @@ const calculateFeedInventoryUsageExpense = async () => {
       return acc;
     }, { totalUsed: 0, cost: 0 });
   };
+  console.log("formattedResult", formattedResult)
 
   const totalToday = formattedResult.filter(item => dayjs(item.date).tz(istTimeZone).isSame(dayjs().tz(istTimeZone).startOf('day'), 'day'));
   const totalThisWeek = formattedResult.filter(item => dayjs(item.date).isSame(dayjs().tz(istTimeZone).startOf('week'), 'week'));
