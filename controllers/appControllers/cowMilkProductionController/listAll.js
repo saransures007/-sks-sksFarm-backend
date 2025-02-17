@@ -27,6 +27,7 @@ const paginatedList = async (Model, req, res) => {
       .populate('cowId', 'earTagNumber rfidKey id') // Populate cow details
       .skip(skip)
       .limit(limit)
+      .sort({ createdAt: -1 }) // Sort by createdAt descending
       .exec();
 
     // Counting the total documents

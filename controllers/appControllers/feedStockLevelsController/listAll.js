@@ -32,6 +32,7 @@ const paginatedList = async (ExpenseModel, FarmModel, req, res) => {
     const resultsPromise = ExpenseModel.find(expenseQuery)
       .skip(skip)
       .limit(limit)
+      .sort({ createdAt: -1 }) // Sort by createdAt descending
       .exec();
 
     const countPromise = ExpenseModel.countDocuments(expenseQuery);

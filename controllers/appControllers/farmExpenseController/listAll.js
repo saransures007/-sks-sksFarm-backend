@@ -26,6 +26,7 @@ const listAll = async (farmExpenseModel, req, res) => {
     const resultsPromise = farmExpenseModel.find(farmExpense)
       .skip(skip)
       .limit(limit)
+      .sort({ date: -1 }) // Sort by createdAt descending
       .exec();
 
     const countPromise = farmExpenseModel.countDocuments(farmExpense);

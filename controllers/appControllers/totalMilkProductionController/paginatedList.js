@@ -28,6 +28,7 @@ const paginatedList = async (Model, req, res) => {
     const resultsPromise = Model.find(query)
       .skip(skip)
       .limit(limit)
+      .sort({ entryDate: -1 })
       .exec();
 
     // Counting the total documents

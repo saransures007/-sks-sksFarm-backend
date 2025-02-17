@@ -2,11 +2,12 @@ const {
   startOfDay, endOfDay, 
   startOfWeek, endOfWeek, 
   startOfMonth, endOfMonth, 
-  startOfYear, endOfYear 
+  startOfYear, endOfYear,addMonths 
 } = require('date-fns');
 
 const summary = async (Model, req, res) => {
   try {
+    const istTimeZone = "Asia/Kolkata";
     const now = new Date();
 
     const todayStart = startOfDay(now);
@@ -14,7 +15,7 @@ const summary = async (Model, req, res) => {
 
     const weekStart = startOfWeek(now, { weekStartsOn: 0 }); // Sunday
     const weekEnd = endOfWeek(now, { weekStartsOn: 0 });
-
+    const firstDayOfNextMonth = startOfMonth(addMonths(now, 1));
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
 
@@ -24,10 +25,9 @@ const summary = async (Model, req, res) => {
     const summaryData = await Model.aggregate([
       {
         $facet: {
+          // Today's Summary
           today: [
-            {
-              $match: { entryDate: { $gte: todayStart, $lte: todayEnd } },
-            },
+            { $match: { entryDate: { $gte: todayStart, $lte: todayEnd } } },
             {
               $group: {
                 _id: null,
@@ -37,12 +37,11 @@ const summary = async (Model, req, res) => {
                 income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
-            },
+            }
           ],
+          // Weekly Summary
           thisWeek: [
-            {
-              $match: { entryDate: { $gte: weekStart, $lte: weekEnd } },
-            },
+            { $match: { entryDate: { $gte: weekStart, $lte: todayEnd } } },
             {
               $group: {
                 _id: null,
@@ -52,12 +51,11 @@ const summary = async (Model, req, res) => {
                 income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
-            },
+            }
           ],
+          // Monthly Summary
           thisMonth: [
-            {
-              $match: { entryDate: { $gte: monthStart, $lte: monthEnd } },
-            },
+            { $match: { entryDate: { $gte: monthStart, $lte: todayEnd } } },
             {
               $group: {
                 _id: null,
@@ -67,12 +65,11 @@ const summary = async (Model, req, res) => {
                 income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
-            },
+            }
           ],
+          // Yearly Summary
           thisYear: [
-            {
-              $match: { entryDate: { $gte: yearStart, $lte: yearEnd } },
-            },
+            { $match: { entryDate: { $gte: yearStart, $lte: todayEnd } } },
             {
               $group: {
                 _id: null,
@@ -82,8 +79,9 @@ const summary = async (Model, req, res) => {
                 income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
-            },
+            }
           ],
+          // Overall Summary
           overall: [
             {
               $group: {
@@ -94,18 +92,31 @@ const summary = async (Model, req, res) => {
                 income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
-            },
+            }
           ],
+          // Day-by-day breakdown for this month
           dayByDayThisMonth: [
-            {
-              $match: { entryDate: { $gte: monthStart, $lte: monthEnd } },
-            },
+            { $match: { entryDate: { $gte: monthStart, $lte: todayEnd } } },
             {
               $group: {
-                _id: { 
-                  date: { 
-                    $dateToString: { format: "%b %d %Y", date: "$entryDate" } 
-                  }
+                _id: { $dateToString: { format: "%b %d %Y", date: "$entryDate", timezone: istTimeZone } },
+                totalMilk: { $sum: '$totalMilk' },
+                avgSnf: { $avg: '$avgSnf' },
+                avgFat: { $avg: '$avgFat' },
+                income: { $sum: { $multiply: ['$totalMilk', '$ratePerLiter'] } },
+                ratePerLiter: { $avg: '$ratePerLiter' },
+              },
+            },
+            { $sort: { _id: 1 } }
+          ],
+          // Month-by-month breakdown for this year
+          monthByMonthThisYear: [
+            { $match: { entryDate: { $gte: yearStart, $lte: todayEnd } } },
+            {
+              $group: {
+                _id: {
+                  month: { $month: "$entryDate" },
+                  year: { $year: "$entryDate" }
                 },
                 totalMilk: { $sum: '$totalMilk' },
                 avgSnf: { $avg: '$avgSnf' },
@@ -113,31 +124,84 @@ const summary = async (Model, req, res) => {
                 ratePerLiter: { $avg: '$ratePerLiter' },
               },
             },
-            {
-              $sort: { '_id.date': 1 },
-            },
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
           ],
-          monthByMonthThisYear: [
+          // Morning & Evening Data
+          morningEveningData: [
             {
-              $match: { entryDate: { $gte: yearStart, $lte: yearEnd } },
+              $match: {
+                entryDate: {
+                  $gte: monthStart, // Start of the current month
+                  $lt: firstDayOfNextMonth // Start of next month
+                }
+              }
+            },
+            {
+              $addFields: {
+                entryDateIST: {
+                  $dateToParts: { date: "$entryDate", timezone: "Asia/Kolkata" }
+                }
+              }
             },
             {
               $group: {
-                _id: { month: { $month: '$entryDate' }, year: { $year: '$entryDate' } },
-                totalMilk: { $sum: '$totalMilk' },
-                avgSnf: { $avg: '$avgSnf' },
-                avgFat: { $avg: '$avgFat' },
-                ratePerLiter: { $avg: '$ratePerLiter' },
-              },
+                _id: {
+                  date: {
+                    $dateToString: { format: "%b %d %Y", date: "$entryDate", timezone: istTimeZone },
+                  },
+                  session: {
+                    $cond: [{ $lt: ["$entryDateIST.hour", 12] }, "morning", "evening"]
+                  }
+                },
+                totalMilk: { $sum: "$totalMilk" },
+                avgSnf: { $avg: "$avgSnf" },
+                avgFat: { $avg: "$avgFat" },
+                income: { $sum: { $multiply: ["$totalMilk", "$ratePerLiter"] } },
+                ratePerLiter: { $avg: "$ratePerLiter" }
+              }
             },
             {
-              $sort: { '_id.month': 1 },
+              $group: {
+                _id: "$_id.date",
+                morning: {
+                  $push: {
+                    $cond: [
+                      { $eq: ["$_id.session", "morning"] },
+                      {
+                        totalMilk: "$totalMilk",
+                        avgSnf: "$avgSnf",
+                        avgFat: "$avgFat",
+                        income: "$income",
+                        ratePerLiter: "$ratePerLiter"
+                      },
+                      "$$REMOVE"
+                    ]
+                  }
+                },
+                evening: {
+                  $push: {
+                    $cond: [
+                      { $eq: ["$_id.session", "evening"] },
+                      {
+                        totalMilk: "$totalMilk",
+                        avgSnf: "$avgSnf",
+                        avgFat: "$avgFat",
+                        income: "$income",
+                        ratePerLiter: "$ratePerLiter"
+                      },
+                      "$$REMOVE"
+                    ]
+                  }
+                }
+              }
             },
-          ],
-        },
-      },
+            { $sort: { _id: 1 } }
+          ]
+          
+          
+        }
+      }
     ]);
-
     const [result] = summaryData;
     if (!result) {
       return res.status(404).json({
@@ -153,6 +217,7 @@ const summary = async (Model, req, res) => {
       income: data.income?.toFixed(2) || '0.00',
       ratePerLiter: data.ratePerLiter?.toFixed(2) || '0.00',
     });
+    console.log("result",result.morningEveningData)
 
     return res.status(200).json({
       success: true,
@@ -163,7 +228,7 @@ const summary = async (Model, req, res) => {
         thisYear: formatData(result.thisYear[0] || {}),
         overall: formatData(result.overall[0] || {}),
         dayByDayThisMonth: result.dayByDayThisMonth.map((item) => ({
-          date: item._id.date,
+          date: item._id,
           totalMilk: item.totalMilk?.toFixed(2) || '0.00',
           avgSnf: item.avgSnf?.toFixed(2) || '0.00',
           avgFat: item.avgFat?.toFixed(2) || '0.00',
@@ -171,6 +236,40 @@ const summary = async (Model, req, res) => {
           ratePerLiter: item.ratePerLiter?.toFixed(2) || '0.00',
         })),
         monthByMonthThisYear: result.monthByMonthThisYear || [],
+        morningEveningData : result.morningEveningData.map((item) => ({
+          date: item._id,
+          morning: item.morning.length > 0
+            ? {
+                totalMilk: item.morning[0]?.totalMilk.toFixed(2) || "0.00",
+                avgSnf: item.morning[0]?.avgSnf.toFixed(2) || "0.00",
+                avgFat: item.morning[0]?.avgFat.toFixed(2) || "0.00",
+                income: (item.morning[0]?.totalMilk * item.morning[0]?.ratePerLiter).toFixed(2) || "0.00",
+                ratePerLiter: item.morning[0]?.ratePerLiter.toFixed(2) || "0.00",
+              }
+            : {
+                totalMilk: "0.00",
+                avgSnf: "0.00",
+                avgFat: "0.00",
+                income: "0.00",
+                ratePerLiter: "0.00",
+              },
+          evening: item.evening.length > 0
+            ? {
+                totalMilk: item.evening[0]?.totalMilk.toFixed(2) || "0.00",
+                avgSnf: item.evening[0]?.avgSnf.toFixed(2) || "0.00",
+                avgFat: item.evening[0]?.avgFat.toFixed(2) || "0.00",
+                income: (item.evening[0]?.totalMilk * item.evening[0]?.ratePerLiter).toFixed(2) || "0.00",
+                ratePerLiter: item.evening[0]?.ratePerLiter.toFixed(2) || "0.00",
+              }
+            : {
+                totalMilk: "0.00",
+                avgSnf: "0.00",
+                avgFat: "0.00",
+                income: "0.00",
+                ratePerLiter: "0.00",
+              },
+        }))
+             
       },
     });
   } catch (error) {

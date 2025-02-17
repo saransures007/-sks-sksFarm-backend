@@ -32,6 +32,7 @@ const paginatedList = async (FeedInventoryModel, FarmModel, req, res) => {
     const resultsPromise = FeedInventoryModel.find(feedInventoryQuery)
       .skip(skip)
       .limit(limit)
+      .sort({ createdAt: -1 }) // Sort by createdAt descending
       .exec();
 
     const countPromise = FeedInventoryModel.countDocuments(feedInventoryQuery);
