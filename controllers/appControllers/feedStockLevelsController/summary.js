@@ -16,6 +16,7 @@ const summaryFeedStockLevels = async (Model, req, res) => {
     settings.forEach(setting => {
       packageSizes[setting.settingKey] = setting.settingValue || 1; // Avoid division by zero
     });
+
     // Aggregate stock levels
     const summaryData = await Model.aggregate([
       {
@@ -35,12 +36,12 @@ const summaryFeedStockLevels = async (Model, req, res) => {
       });
     }
 
-    // Calculate package availability
-    const totalSilagePackages = Math.floor(summaryData[0].totalSilageStock / packageSizes.silage_package_size);
-    const totalTMRPackages = Math.floor(summaryData[0].totalTMRFeedStock / packageSizes.tmr_package_size);
-    const totalPelletPackages = Math.floor(summaryData[0].totalPelletsStock / packageSizes.pellets_package_size);
+    // Calculate package availability (rounded to 2 decimals)
+    const totalSilagePackages = (summaryData[0].totalSilageStock / packageSizes.silage_package_size).toFixed(2);
+    const totalTMRPackages = (summaryData[0].totalTMRFeedStock / packageSizes.tmr_package_size).toFixed(2);
+    const totalPelletPackages = (summaryData[0].totalPelletFeedStock / packageSizes.pellets_package_size).toFixed(2);
 
-    // Calculate average daily usage
+    // Calculate average daily usage (last 7 days)
     const last7DaysUsage = await feedInventoryUsageModel.aggregate([
       {
         $match: {
@@ -60,10 +61,10 @@ const summaryFeedStockLevels = async (Model, req, res) => {
       dailyUsageMap[usage._id] = usage.avgDailyUsage || 1; // Avoid division by zero
     });
 
-    // Predict stock availability in days
-    const predictedSilageDays = Math.floor(summaryData[0].totalSilageStock / (dailyUsageMap['Silage'] || 1));
-    const predictedTMRDays = Math.floor(summaryData[0].totalTMRFeedStock / (dailyUsageMap['TMR Feed'] || 1));
-    const predictedPelletDays = Math.floor(summaryData[0].totalPelletFeedStock / (dailyUsageMap['Pellet Feed'] || 1));
+    // Predict stock availability in days (rounded to 2 decimals)
+    const predictedSilageDays = (summaryData[0].totalSilageStock / (dailyUsageMap['Silage'] || 1)).toFixed(2);
+    const predictedTMRDays = (summaryData[0].totalTMRFeedStock / (dailyUsageMap['TMR Feed'] || 1)).toFixed(2);
+    const predictedPelletDays = (summaryData[0].totalPelletFeedStock / (dailyUsageMap['Pellet Feed'] || 1)).toFixed(2);
 
     return res.status(200).json({
       success: true,
