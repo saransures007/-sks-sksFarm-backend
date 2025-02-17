@@ -99,7 +99,7 @@ const summary = async (Model, req, res) => {
             { $match: { entryDate: { $gte: monthStart, $lte: todayEnd } } },
             {
               $group: {
-                _id: { $dateToString: { format: "%b %d %Y", date: "$entryDate", timezone: istTimeZone } },
+                _id: {$dateToString: { format: "%Y-%m-%d", date: "$entryDate", timezone: "Asia/Kolkata" } },
                 totalMilk: { $sum: '$totalMilk' },
                 avgSnf: { $avg: '$avgSnf' },
                 avgFat: { $avg: '$avgFat' },
@@ -147,7 +147,7 @@ const summary = async (Model, req, res) => {
               $group: {
                 _id: {
                   date: {
-                    $dateToString: { format: "%b %d %Y", date: "$entryDate", timezone: istTimeZone },
+                    $dateToString: { format: "%Y-%m-%d", date: "$entryDate", timezone: "Asia/Kolkata" }
                   },
                   session: {
                     $cond: [{ $lt: ["$entryDateIST.hour", 12] }, "morning", "evening"]
