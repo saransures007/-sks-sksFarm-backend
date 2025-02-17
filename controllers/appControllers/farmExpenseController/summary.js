@@ -78,11 +78,7 @@ const calculateFeedInventoryUsageExpense = async () => {
       $group: {
         _id: {
           day: {
-            $dateToString: { 
-              format: "%b %d", 
-              date: { $toDate: "$date" },
-              timezone: istTimeZone // Convert to IST timezone
-            }
+            $dateToString: { format: "%Y-%m-%d", date: { $toDate: "$date" }, timezone: "Asia/Kolkata" }
           },
           feedType: "$feedType"
         },
@@ -109,9 +105,8 @@ const calculateFeedInventoryUsageExpense = async () => {
     const cost = totalUsed * avgCost;
 
     if (!acc[day]) {
-      acc[day] = { date: `${day} ${new Date().getFullYear()}`, feeds: {}, totalCost: 0 };  // Format the date properly
+      acc[day] = { date: `${day}`, feeds: {}, totalCost: 0 };  // Format the date properly
     }
-
     acc[day].feeds[feedType] = {
       totalUsed,
       cost
