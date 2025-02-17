@@ -1,6 +1,24 @@
 [
     {
         "settingCategory": "farm_settings",
+        "settingKey": "tmr_package_size",
+        "settingValue": 25,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "pellets_package_size",
+        "settingValue": 70,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
+        "settingKey": "silage_package_size",
+        "settingValue": 70,
+        "valueType": "number"
+    },
+    {
+        "settingCategory": "farm_settings",
         "settingKey": "expected_silage_per_day",
         "settingValue": 0,
         "valueType": "number"

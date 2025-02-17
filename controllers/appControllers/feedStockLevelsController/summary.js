@@ -1,8 +1,22 @@
 const mongoose = require('mongoose');
 const feedInventoryModel = mongoose.model('feedInventory');
+const feedInventoryUsageModel = mongoose.model('feedInventoryUsage');
+const SettingsModel = mongoose.model('setting');
+
 const summaryFeedStockLevels = async (Model, req, res) => {
   try {
-    // Aggregate the feed stock data
+    // Fetch package sizes from settings
+    const settings = await SettingsModel.find({
+      settingKey: { 
+        $in: ['tmr_package_size', 'silage_package_size', 'pellets_package_size'] 
+      }
+    }).lean();
+
+    const packageSizes = {};
+    settings.forEach(setting => {
+      packageSizes[setting.settingKey] = setting.settingValue || 1; // Avoid division by zero
+    });
+    // Aggregate stock levels
     const summaryData = await Model.aggregate([
       {
         $group: {
@@ -21,53 +35,35 @@ const summaryFeedStockLevels = async (Model, req, res) => {
       });
     }
 
-    // Fetch feed inventory data to calculate cost and quantity for each feed type
-    const feedInventoryData = await feedInventoryModel.aggregate([
+    // Calculate package availability
+    const totalSilagePackages = Math.floor(summaryData[0].totalSilageStock / packageSizes.silage_package_size);
+    const totalTMRPackages = Math.floor(summaryData[0].totalTMRFeedStock / packageSizes.tmr_package_size);
+    const totalPelletPackages = Math.floor(summaryData[0].totalPelletsStock / packageSizes.pellets_package_size);
+
+    // Calculate average daily usage
+    const last7DaysUsage = await feedInventoryUsageModel.aggregate([
       {
         $match: {
-          feedType: { $in: ['Silage', 'TMR Feed', 'Pellet Feed'] }, // Filter for relevant feed types
+          date: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         },
       },
       {
         $group: {
           _id: '$feedType',
-          totalQuantity: { $sum: '$quantity' },
-          totalCost: { $sum: '$totalCost' },
+          avgDailyUsage: { $avg: '$quantityUsed' },
         },
       },
     ]);
 
-    // Create a map for average prices
-    const avgPrices = {
-      avgTotalSilageStockPrice: 0,
-      avgTotalTMRFeedStockPrice: 0,
-      avgTotalPelletFeedStockPrice: 0,
-    };
-
-    // Assign calculated average prices based on feed type
-    feedInventoryData.forEach(feed => {
-      if (feed.totalQuantity > 0) {
-        if (feed._id === 'Silage') {
-          avgPrices.avgTotalSilageStockPrice = feed.totalCost / feed.totalQuantity;
-        } else if (feed._id === 'TMR Feed') {
-          avgPrices.avgTotalTMRFeedStockPrice = feed.totalCost / feed.totalQuantity;
-        } else if (feed._id === 'Pellet Feed') {
-          avgPrices.avgTotalPelletFeedStockPrice = feed.totalCost / feed.totalQuantity;
-        }
-      }
+    const dailyUsageMap = {};
+    last7DaysUsage.forEach(usage => {
+      dailyUsageMap[usage._id] = usage.avgDailyUsage || 1; // Avoid division by zero
     });
 
-    // Fetch the latest updated record
-    const lastUpdatedRecord = await Model.findOne({})
-      .sort({ lastUpdated: -1 })
-      .select('silageStock tmrFeedStock pelletFeedStock lastUpdated recordedBy');
-
-    if (!lastUpdatedRecord) {
-      return res.status(404).json({
-        success: false,
-        message: 'No last updated record available.',
-      });
-    }
+    // Predict stock availability in days
+    const predictedSilageDays = Math.floor(summaryData[0].totalSilageStock / (dailyUsageMap['Silage'] || 1));
+    const predictedTMRDays = Math.floor(summaryData[0].totalTMRFeedStock / (dailyUsageMap['TMR Feed'] || 1));
+    const predictedPelletDays = Math.floor(summaryData[0].totalPelletFeedStock / (dailyUsageMap['Pellet Feed'] || 1));
 
     return res.status(200).json({
       success: true,
@@ -75,9 +71,13 @@ const summaryFeedStockLevels = async (Model, req, res) => {
         totalSilageStock: summaryData[0].totalSilageStock,
         totalTMRFeedStock: summaryData[0].totalTMRFeedStock,
         totalPelletFeedStock: summaryData[0].totalPelletFeedStock,
-        ...avgPrices, // Include average prices in the result
+        totalSilagePackages,
+        totalTMRPackages,
+        totalPelletPackages,
+        predictedSilageDays,
+        predictedTMRDays,
+        predictedPelletDays,
       },
-      lastUpdatedRecord,
     });
   } catch (error) {
     return res.status(500).json({
